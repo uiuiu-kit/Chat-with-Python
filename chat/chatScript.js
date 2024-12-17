@@ -1,79 +1,96 @@
-function chatOutput(message) {
-    // Erstellen des Chat-Nachrichten-Containers
-    const messageContainer = document.createElement('div');
-    messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-start');
+class ChatManager {
+    constructor({ chatContainerId, inputFieldId, sendButtonId, onUserInput = null }) {
+        // DOM-Elemente und Konfigurationsparameter speichern
+        this.chatContainer = document.getElementById(chatContainerId);
+        this.inputField = document.getElementById(inputFieldId);
+        this.sendButton = document.getElementById(sendButtonId);
 
-    // Erstellen des Avatars (bot.png)
-    const avatar = document.createElement('img');
-    avatar.src = 'chat/chat_img/bot.png';
-    avatar.alt = 'avatar 1';
-    avatar.style.width = '45px';
-    avatar.style.height = '100%';
+        // Callback für Nutzer-Eingaben
+        this.onUserInput = onUserInput;
 
-    // Erstellen des Text-Containers
-    const textContainer = document.createElement('div');
+        // Listener initialisieren
+        this.initializeListeners();
+    }
 
-    // Erstellen der Nachricht (p-Tag mit der Nachricht)
-    const messageElement = document.createElement('p');
-    messageElement.classList.add('small', 'p-2', 'ms-3', 'mb-1', 'rounded-3', 'bg-body-tertiary');
-    messageElement.textContent = message;
+    // Methode für Chat-Ausgabe
+    chatOutput(message) {
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-start');
 
-    // Anhängen der Elemente
-    textContainer.appendChild(messageElement);
-    messageContainer.appendChild(avatar);
-    messageContainer.appendChild(textContainer);
+        const avatar = document.createElement('img');
+        avatar.src = 'chat/chat_img/bot.png';
+        avatar.alt = 'avatar 1';
+        avatar.style.width = '45px';
+        avatar.style.height = '100%';
 
-    // Die Nachricht dem Chat-Container hinzufügen
-    document.getElementById('chat-container').appendChild(messageContainer);
-}
+        const textContainer = document.createElement('div');
+        const messageElement = document.createElement('p');
+        messageElement.classList.add('small', 'p-2', 'ms-3', 'mb-1', 'rounded-3', 'bg-body-tertiary');
+        messageElement.textContent = message;
 
-function chatInput(message) {
-    // Erstellen des Chat-Nachrichten-Containers
-    const messageContainer = document.createElement('div');
-    messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-4', 'pt-1');
+        textContainer.appendChild(messageElement);
+        messageContainer.appendChild(avatar);
+        messageContainer.appendChild(textContainer);
 
-    // Erstellen des Avatars (user.png)
-    const avatar = document.createElement('img');
-    avatar.src = 'chat/chat_img/user.png';
-    avatar.alt = 'avatar 1';
-    avatar.style.width = '45px';
-    avatar.style.height = '100%';
+        this.chatContainer.appendChild(messageContainer);
+    }
 
-    // Erstellen des Text-Containers
-    const textContainer = document.createElement('div');
+    // Methode für Chat-Eingabe
+    chatInput(message) {
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-4', 'pt-1');
 
-    // Erstellen der Nachricht (p-Tag mit der Nachricht)
-    const messageElement = document.createElement('p');
-    messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'text-white', 'rounded-3', 'bg-primary');
-    messageElement.textContent = message;
+        const avatar = document.createElement('img');
+        avatar.src = 'chat/chat_img/user.png';
+        avatar.alt = 'avatar 1';
+        avatar.style.width = '45px';
+        avatar.style.height = '100%';
 
-    // Anhängen der Elemente
-    textContainer.appendChild(messageElement);
-    messageContainer.appendChild(textContainer); // erst Text dann Avatar für die korrekte Reihnfolge
-    messageContainer.appendChild(avatar);
+        const textContainer = document.createElement('div');
+        const messageElement = document.createElement('p');
+        messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'text-white', 'rounded-3', 'bg-primary');
+        messageElement.textContent = message;
 
-    // Die Nachricht dem Chat-Container hinzufügen
-    document.getElementById('chat-container').appendChild(messageContainer);
-}
+        textContainer.appendChild(messageElement);
+        messageContainer.appendChild(textContainer);
+        messageContainer.appendChild(avatar);
 
-function clearInput() {
-    document.getElementById('exampleFormControlInput1').value = '';
-}
+        this.chatContainer.appendChild(messageContainer);
+    }
 
-function processInput(){
-    const input = document.getElementById('exampleFormControlInput1').value;
+    // Eingabe verarbeiten
+    processInput() {
+        const input = this.inputField.value;
 
-    chatInput(input);
+        if (input.trim()) {
+            // Nutzer-Eingabe anzeigen
+            this.chatInput(input);
 
-    clearInput()
-}
+            // Callback aufrufen, wenn definiert
+            if (typeof this.onUserInput === 'function') {
+                this.onUserInput(input);
+            }
 
-function onEnterPress(event) {
-    if (event.key === 'Enter') {
-        processInput()
+            // Eingabefeld leeren
+            this.clearInput();
+        }
+    }
+
+    // Eingabefeld leeren
+    clearInput() {
+        this.inputField.value = '';
+    }
+
+    // Listener für Benutzerinteraktionen
+    initializeListeners() {
+        this.inputField.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                this.processInput();
+            }
+        });
+
+        this.sendButton.addEventListener('click', () => this.processInput());
     }
 }
 
-// Listener für das Eingabefeld
-document.getElementById('exampleFormControlInput1').addEventListener('keydown', onEnterPress);
-document.getElementById('sendMessage').addEventListener('click', processInput);
+export default ChatManager;

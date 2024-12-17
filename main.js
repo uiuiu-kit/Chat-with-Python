@@ -1,12 +1,14 @@
 // main.js
 import { WorkerManager } from "./webworker/worker-manager.js";
+import ChatManager from './chat/chatScript.js';
 
 // Initialisieren
 const workerManager = new WorkerManager("./webworker/webworker.js");
 
-document.getElementById("myButton").addEventListener("click", async () => {
-  console.log("Initialisiere Worker...");
-  await workerManager.initialize();
+console.log("Initialisiere Worker...");
+await workerManager.initialize();
+
+document.getElementById("python-run-button").addEventListener("click", async () => {
 
   console.log("Lade Python-Skript...");
   const response = await fetch("webworker/script.py");
@@ -14,13 +16,27 @@ document.getElementById("myButton").addEventListener("click", async () => {
 
   console.log("Führe Python-Skript aus...");
   try {
-    const result = await workerManager.runScript(pyScript, (prompt, provideInput) => {
-      console.log("Benutzereingabe erforderlich:", prompt);
-      const inputValue = prompt("Geben Sie eine Eingabe ein:");
-      provideInput(inputValue);
-    });
+    const result = await workerManager.runScript(pyScript, onInput);
     console.log("Ergebnis des Python-Skripts:", result);
   } catch (error) {
     console.error("Fehler beim Ausführen des Skripts:", error.message);
   }
+});
+
+function onInput(prompt) {
+  chatManager.chatOutput(prompt)
+}
+
+// Funktion, die aufgerufen wird, wenn der Nutzer etwas eingibt
+function handleUserInput(input, ) {
+  console.log("Nutzereingabe verarbeitet:", input);
+  workerManager.getInput(input)
+}
+
+// ChatManager-Instanz erstellen
+const chatManager = new ChatManager({
+  chatContainerId: 'chat-container',
+  inputFieldId: 'exampleFormControlInput1',
+  sendButtonId: 'sendMessage',
+  onUserInput: handleUserInput
 });

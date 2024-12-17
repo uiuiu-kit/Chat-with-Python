@@ -6,6 +6,7 @@ export class WorkerManager {
       this.callbacks = {};
       this.worker.onmessage = (event) => this.handleMessage(event);
       this.nextId = 0;
+      this.waitingInput = false;
     }
   
     handleMessage(event) {
@@ -18,15 +19,14 @@ export class WorkerManager {
             this.callbacks[id].resolve("initialized");
           }
         } else if (status === "success") {
-          resolve(result);
+          console.log("Python-Programm abgeschlossen:", result);
         } else if (status === "await_input") {
+          this.waitingInput = true
           if (onInput) {
-            onInput(prompt, (input) => {
-              this.worker.postMessage({ type: "USER_INPUT", data: input, id });
-            });
+            onInput(prompt)
           }
         } else if (status === "error") {
-          reject(new Error(result));
+          console.error("Fehler:", result);
         }
         if (status !== "await_input") {
           delete this.callbacks[id];
@@ -34,6 +34,13 @@ export class WorkerManager {
       }
     }
   
+    getInput(inputValue) {
+      if (this.waitingInput) {
+        this.worker.postMessage({type: "USER_INPUT", data: inputValue})
+        this.waitingInput = false
+      }
+    }
+
     async initialize() {
       return this.sendMessage({ type: "INIT" });
     }

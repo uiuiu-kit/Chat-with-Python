@@ -34,7 +34,6 @@ function handleGenerator(generator, id, input = null) {
     self.postMessage({ id, status: "error", result: error.message });
     return;
   }
-
   if (result.done) {
     // Generator abgeschlossen
     self.postMessage({ id, status: "success", result: result.value });
