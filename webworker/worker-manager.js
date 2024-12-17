@@ -36,7 +36,7 @@ export class WorkerManager {
   
     getInput(inputValue) {
       if (this.waitingInput) {
-        this.worker.postMessage({type: "USER_INPUT", data: inputValue})
+        this.sendMessage({type: "USER_INPUT", data: inputValue})
         this.waitingInput = false
       }
     }
