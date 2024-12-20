@@ -27,9 +27,15 @@ function onInput(prompt) {
   chatManager.chatOutput(prompt)
 }
 
-function handleUpload(upload) {
+async function handleUpload(upload) {
   console.log("Upload verarbeiten", upload.name)
-  workerManager.getInput(upload)
+  try {
+    const arrayBuffer = await upload.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    workerManager.getInput(uint8Array)
+  } catch (error) {
+      console.error("Fehler beim Lesen des ArrayBuffers:", error);
+  }
 }
 
 // Funktion, die aufgerufen wird, wenn der Nutzer etwas eingibt

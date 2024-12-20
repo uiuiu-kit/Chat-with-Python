@@ -10,21 +10,10 @@ def process_input(data):
     if isinstance(data, str):
         print("Das ist ein Text.")
         # Text-spezifische Verarbeitung
-    elif isinstance(data, BytesIO):
-        # Prüfen, ob es sich um ein Bild oder eine CSV handelt
-        content = data.getvalue()
-        if content.startswith(b'\x89PNG') or content.startswith(b'\xFF\xD8'):
-            print("Das ist ein Bild.")
-            byte_stream = BytesIO(data.to_py())
-            image = Image.open(byte_stream)
-            return image
-        elif b',' in content or b'\n' in content:
-            print("Das ist eine CSV-Datei.")
-            # CSV-spezifische Verarbeitung
-        else:
-            print("Unbekannter BytesIO-Inhalt.")
     else:
-        print("Unbekannter Typ.")
+        byte_stream = BytesIO(data.to_py())
+        data = Image.open(byte_stream)
+    return data
     
 
 def main():

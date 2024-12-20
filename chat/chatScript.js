@@ -94,7 +94,6 @@ class ChatManager {
     // Upload verarbeiten
     processUpload() {
         const upload = this.fileInputButton.files[0];
-        console.log(upload)
         if (upload) {
             // Nutzer-Eingabe anzeigen
             this.chatInput(upload);
