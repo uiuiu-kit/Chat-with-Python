@@ -60,7 +60,7 @@ class ChatManager {
         } else if (message.type == 'image/png' ) {
             // Wenn Bild, Nachricht als Bild anzeigen
             const imageElement = document.createElement('img');
-            imageElement.src = message; // Bildquelle (Base64 oder URL)
+            imageElement.src = URL.createObjectURL(message); // Bildquelle (Base64 oder URL)
             imageElement.alt = 'Gesendetes Bild';
             imageElement.style.maxWidth = '200px'; // Maximale Breite für Bilder
             imageElement.style.borderRadius = '8px'; // Abgerundete Ecken
@@ -94,6 +94,7 @@ class ChatManager {
     // Upload verarbeiten
     processUpload() {
         const upload = this.fileInputButton.files[0];
+        console.log(upload)
         if (upload) {
             // Nutzer-Eingabe anzeigen
             this.chatInput(upload);
