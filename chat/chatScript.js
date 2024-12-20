@@ -1,12 +1,14 @@
 class ChatManager {
-    constructor({ chatContainerId, inputFieldId, sendButtonId, onUserInput = null }) {
+    constructor({ chatContainerId, inputFieldId, sendButtonId, fileInputButtonId, onUserInput = null, onUpload = null }) {
         // DOM-Elemente und Konfigurationsparameter speichern
         this.chatContainer = document.getElementById(chatContainerId);
         this.inputField = document.getElementById(inputFieldId);
         this.sendButton = document.getElementById(sendButtonId);
+        this.fileInputButton = document.getElementById(fileInputButtonId);
 
         // Callback für Nutzer-Eingaben
         this.onUserInput = onUserInput;
+        this.onUpload = onUpload
 
         // Listener initialisieren
         this.initializeListeners();
@@ -47,14 +49,27 @@ class ChatManager {
         avatar.style.height = '100%';
 
         const textContainer = document.createElement('div');
-        const messageElement = document.createElement('p');
-        messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'text-white', 'rounded-3', 'bg-primary');
-        messageElement.textContent = message;
-
-        textContainer.appendChild(messageElement);
+    
+        // Überprüfen, ob die Eingabe ein Bild oder Text ist
+        if (typeof message === 'string') {
+            // Wenn Text, Nachricht als Text anzeigen
+            const messageElement = document.createElement('p');
+            messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'text-white', 'rounded-3', 'bg-primary');
+            messageElement.textContent = message;
+            textContainer.appendChild(messageElement);
+        } else if (message.type == 'image/png' ) {
+            // Wenn Bild, Nachricht als Bild anzeigen
+            const imageElement = document.createElement('img');
+            imageElement.src = message; // Bildquelle (Base64 oder URL)
+            imageElement.alt = 'Gesendetes Bild';
+            imageElement.style.maxWidth = '200px'; // Maximale Breite für Bilder
+            imageElement.style.borderRadius = '8px'; // Abgerundete Ecken
+            textContainer.appendChild(imageElement);
+        }
+    
         messageContainer.appendChild(textContainer);
         messageContainer.appendChild(avatar);
-
+    
         this.chatContainer.appendChild(messageContainer);
     }
 
@@ -76,6 +91,28 @@ class ChatManager {
         }
     }
 
+    // Upload verarbeiten
+    processUpload() {
+        const upload = this.fileInputButton.files[0];
+        if (upload) {
+            // Nutzer-Eingabe anzeigen
+            this.chatInput(upload);
+
+            // Callback aufrufen, wenn definiert
+            if (typeof this.onUserInput === 'function') {
+                this.onUpload(upload);
+            }
+        }
+        
+        // Upload leeren
+        this.clearUpload();
+    }
+
+    //// Upload leeren
+    clearUpload() {
+        this.fileInputButton.value = null;
+    }
+
     // Eingabefeld leeren
     clearInput() {
         this.inputField.value = '';
@@ -90,6 +127,7 @@ class ChatManager {
         });
 
         this.sendButton.addEventListener('click', () => this.processInput());
+        this.fileInputButton.addEventListener('change', () => this.processUpload())
     }
 }
 

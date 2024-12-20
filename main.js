@@ -27,6 +27,11 @@ function onInput(prompt) {
   chatManager.chatOutput(prompt)
 }
 
+function handleUpload(upload) {
+  console.log("Upload verarbeiten", upload.name)
+  workerManager.getInput(upload)
+}
+
 // Funktion, die aufgerufen wird, wenn der Nutzer etwas eingibt
 function handleUserInput(input, ) {
   console.log("Nutzereingabe verarbeitet:", input);
@@ -38,5 +43,7 @@ const chatManager = new ChatManager({
   chatContainerId: 'chat-container',
   inputFieldId: 'exampleFormControlInput1',
   sendButtonId: 'sendMessage',
-  onUserInput: handleUserInput
+  fileInputButtonId: 'fileInput',
+  onUserInput: handleUserInput,
+  onUpload: handleUpload
 });

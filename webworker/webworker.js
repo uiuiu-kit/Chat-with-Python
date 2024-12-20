@@ -10,6 +10,7 @@ self.onmessage = async (event) => {
 
   if (type === "INIT") {
     pyodide = await loadPyodide();
+    await pyodide.loadPackage(["pillow"]);
     self.postMessage({ id, status: "initialized" });
   } else if (type === "RUN") {
     try {
