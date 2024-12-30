@@ -27,6 +27,10 @@ export class WorkerManager {
           }
         } else if (status === "error") {
           console.error("Fehler:", result);
+        } else if (status === "info") {
+          console.error("Info:", result)
+        } else if (status === "unknown_message") {
+          console.error("UM:", result)
         }
         if (status !== "await_input") {
           delete this.callbacks[id];

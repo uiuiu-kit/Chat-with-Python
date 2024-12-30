@@ -39,7 +39,24 @@ function handleGenerator(generator, id, input = null) {
     // Generator abgeschlossen
     self.postMessage({ id, status: "success", result: result.value });
   } else {
-    // Generator wartet auf Eingabe
-    self.postMessage({ id, status: "await_input", prompt: result.value });
+    try {
+      // Verarbeite den Zwischenwert, der vom Generator zurückgegeben wurde
+      const message = JSON.parse(result.value);
+
+      if (message.type === "question") {
+        self.postMessage({ id, status: "await_input", prompt: message.content });
+      } else if (message.type === "info") {
+        self.postMessage({ id, status: "info", message: message.content });
+        // Generator ohne Eingabe fortsetzen
+        handleGenerator(generator, id);
+      } else if (message.type === "error") {
+        self.postMessage({ id, status: "error", message: message.content });
+      } else {
+        self.postMessage({ id, status: "unknown_message", message: message });
+      }
+    } catch (error) {
+      // Wenn die Nachricht kein JSON ist, direkt weitergeben
+      self.postMessage({ id, status: "unknown_output", message: result.value });
+    }
   }
 }
