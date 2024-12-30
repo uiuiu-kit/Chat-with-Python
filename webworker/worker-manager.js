@@ -10,7 +10,7 @@ export class WorkerManager {
     }
   
     handleMessage(event) {
-      const { id, status, result, prompt } = event.data;
+      const { id, status, message, prompt } = event.data;
       if (this.callbacks[id]) {
         const { resolve, reject, onInput } = this.callbacks[id];
         if (status === "initialized") {
@@ -19,18 +19,18 @@ export class WorkerManager {
             this.callbacks[id].resolve("initialized");
           }
         } else if (status === "success") {
-          console.log("Python-Programm abgeschlossen:", result);
+          console.log("Python-Programm abgeschlossen:", message);
         } else if (status === "await_input") {
           this.waitingInput = true
           if (onInput) {
             onInput(prompt)
           }
         } else if (status === "error") {
-          console.error("Fehler:", result);
+          console.error("Fehler:");
         } else if (status === "info") {
-          console.error("Info:", result)
+          console.log("Info:")
         } else if (status === "unknown_message") {
-          console.error("UM:", result)
+          console.log("UM:")
         }
         if (status !== "await_input") {
           delete this.callbacks[id];

@@ -32,17 +32,16 @@ function handleGenerator(generator, id, input = null) {
     // Generator mit optionalem Input fortsetzen
     result = input ? generator.next(input) : generator.next();
   } catch (error) {
-    self.postMessage({ id, status: "error", result: error.message });
+    self.postMessage({ id, status: "error", message: error.message });
     return;
   }
   if (result.done) {
     // Generator abgeschlossen
-    self.postMessage({ id, status: "success", result: result.value });
+    self.postMessage({ id, status: "success", message: result.value });
   } else {
     try {
       // Verarbeite den Zwischenwert, der vom Generator zurückgegeben wurde
       const message = JSON.parse(result.value);
-
       if (message.type === "question") {
         self.postMessage({ id, status: "await_input", prompt: message.content });
       } else if (message.type === "info") {
