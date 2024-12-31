@@ -10,21 +10,14 @@ def get_input(question):
 
 def process_input(data):
     if isinstance(data, str):
-        send_message("info", "Das ist ein Text.")
-        # Text-spezifische Verarbeitung
         return data
     else:
         byte_stream = BytesIO(data.to_py())
         image = Image.open(byte_stream)
         return image
-
-def main():
-    send_message("info", "Start")  # Informiert über den Start
-    img = yield from get_input("Lade ein Bild hoch")  # Wartet auf Benutzerinput
-    send_message("info", f"Die Größe des Bildes ist {img.size}!")  # Bildinformationen
-    send_message("info", "Fertig!")  # Ende der Verarbeitung
-    return "Fertig!"
-
+    
+def output(text):
+    send_message("info", text)
 
 def send_message(message_type, content):
     """
@@ -37,5 +30,24 @@ def send_message(message_type, content):
         "content": content
     }
     print(json.dumps(message))  # Übergibt die Nachricht an JS
+
+# Befehlsliste
+# output(text)
+# get_input(question)
+
+def img_demo():
+    output("Start")  # Informiert über den Start
+    img = yield from get_input("Lade ein Bild hoch")  # Wartet auf Benutzerinput
+    output(f"Die Größe des Bildes ist {img.size}!")  # Bildinformationen
+    output("Fertig!")  # Ende der Verarbeitung
+
+def text_demo():
+    output("Start")
+    name = yield from get_input("Wie heißt du?")
+    output(f"Hallo {name}")
+
+def main():
+    yield from text_demo()
+    return "Fertig"
 
 main()
