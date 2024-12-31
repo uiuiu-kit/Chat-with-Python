@@ -16,14 +16,14 @@ document.getElementById("python-run-button").addEventListener("click", async () 
 
   console.log("Führe Python-Skript aus...");
   try {
-    const result = await workerManager.runScript(pyScript, onInput);
+    const result = await workerManager.runScript(pyScript, Output);
     console.log("Ergebnis des Python-Skripts:", result);
   } catch (error) {
     console.error("Fehler beim Ausführen des Skripts:", error.message);
   }
 });
 
-function onInput(prompt) {
+function Output(prompt) {
   chatManager.chatOutput(prompt)
 }
 

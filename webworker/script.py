@@ -37,3 +37,5 @@ def send_message(message_type, content):
         "content": content
     }
     print(json.dumps(message))  # Übergibt die Nachricht an JS
+
+main()

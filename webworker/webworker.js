@@ -14,10 +14,14 @@ self.onmessage = async (event) => {
     self.postMessage({ id, status: "initialized" });
   } else if (type === "RUN") {
     try {
+      // Redirect stdout
+      pyodide.setStdout({ batched: (msg) => processPythonOutput(msg, id) });
+
+      // Run Python script
       currentGenerator = pyodide.runPython(script);
       handleGenerator(currentGenerator, id);
     } catch (error) {
-      self.postMessage({ id, status: "error", result: error.message });
+      self.postMessage({ id, status: "error", message: error.message });
     }
   } else if (type === "USER_INPUT") {
     if (currentGenerator) {
@@ -29,33 +33,27 @@ self.onmessage = async (event) => {
 function handleGenerator(generator, id, input = null) {
   let result;
   try {
-    // Generator mit optionalem Input fortsetzen
+    // Weiter mit optionalem Input
     result = input ? generator.next(input) : generator.next();
   } catch (error) {
     self.postMessage({ id, status: "error", message: error.message });
     return;
   }
+
   if (result.done) {
-    // Generator abgeschlossen
     self.postMessage({ id, status: "success", message: result.value });
-  } else {
-    try {
-      // Verarbeite den Zwischenwert, der vom Generator zurückgegeben wurde
-      const message = JSON.parse(result.value);
-      if (message.type === "question") {
-        self.postMessage({ id, status: "await_input", prompt: message.content });
-      } else if (message.type === "info") {
-        self.postMessage({ id, status: "info", message: message.content });
-        // Generator ohne Eingabe fortsetzen
-        handleGenerator(generator, id);
-      } else if (message.type === "error") {
-        self.postMessage({ id, status: "error", message: message.content });
-      } else {
-        self.postMessage({ id, status: "unknown_message", message: message });
-      }
-    } catch (error) {
-      // Wenn die Nachricht kein JSON ist, direkt weitergeben
-      self.postMessage({ id, status: "unknown_output", message: result.value });
-    }
+  }
+}
+
+function processPythonOutput(text, id) {
+  const trimmedText = text.trim();
+  if (!trimmedText) return; // Ignoriere leere Ausgaben
+  
+  try {
+    const message = JSON.parse(trimmedText);
+    self.postMessage({ id, status: message.type, message: message.content });
+  } catch (error) {
+    // Fallback: Sende unformatierte Ausgaben
+    self.postMessage({ id, status: "raw_output", message: trimmedText });
   }
 }

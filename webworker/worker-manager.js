@@ -10,9 +10,9 @@ export class WorkerManager {
     }
   
     handleMessage(event) {
-      const { id, status, message, prompt } = event.data;
+      const { id, status, message} = event.data;
       if (this.callbacks[id]) {
-        const { resolve, reject, onInput } = this.callbacks[id];
+        const { resolve, reject, Output } = this.callbacks[id]; //output hinzufügen
         if (status === "initialized") {
           console.log("Worker erfolgreich initialisiert!");
           if (this.callbacks[id]) {
@@ -20,19 +20,19 @@ export class WorkerManager {
           }
         } else if (status === "success") {
           console.log("Python-Programm abgeschlossen:", message);
-        } else if (status === "await_input") {
-          this.waitingInput = true
-          if (onInput) {
-            onInput(prompt)
-          }
         } else if (status === "error") {
-          console.error("Fehler:");
-        } else if (status === "info") {
-          console.log("Info:")
+          console.error("Fehler:", message);
         } else if (status === "unknown_message") {
-          console.log("UM:")
+          console.log("UM:", message)
+        } else if (status === "question") {
+          this.waitingInput = true;
         }
-        if (status !== "await_input") {
+        if (["info", "question"].includes(status)) {
+          if (Output) {
+            Output(message)
+          }
+        }
+        if (["error", "succes"].includes(status)) {
           delete this.callbacks[id];
         }
       }
@@ -49,14 +49,14 @@ export class WorkerManager {
       return this.sendMessage({ type: "INIT" });
     }
   
-    async runScript(script, onInput) {
-      return this.sendMessage({ type: "RUN", script }, onInput);
+    async runScript(script, Output) {
+      return this.sendMessage({ type: "RUN", script, id :1 }, Output);
     }
   
-    sendMessage(message, onInput = null) {
+    sendMessage(message, Output = null) {
       const id = this.nextId++;
       return new Promise((resolve, reject) => {
-        this.callbacks[id] = { resolve, reject, onInput };
+        this.callbacks[id] = { resolve, reject, Output };
         this.worker.postMessage({ ...message, id });
       });
     }
