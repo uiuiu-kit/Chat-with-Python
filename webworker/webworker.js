@@ -10,7 +10,9 @@ self.onmessage = async (event) => {
 
   if (type === "INIT") {
     pyodide = await loadPyodide();
-    await pyodide.loadPackage(["pillow"]);
+    await pyodide.loadPackage(["pillow", "micropip"]);
+    const micropip = pyodide.pyimport("micropip");
+    await micropip.install('jsConnector-1.0.0-py3-none-any.whl');
     self.postMessage({ id, status: "initialized" });
   } else if (type === "RUN") {
     try {
