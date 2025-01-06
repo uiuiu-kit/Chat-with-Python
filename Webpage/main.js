@@ -28,8 +28,8 @@ document.getElementById("python-run-example-button").addEventListener("click", a
 document.getElementById("python-run-button").addEventListener("click", async () => {
 
   console.log("Lade Python-Skript...");
-  
-  const pyScript = document.getElementById("largeTextInput").value
+
+  const pyScript = editor.getValue()
 
   console.log("Führe Python-Skript aus...");
   try {
@@ -69,4 +69,16 @@ const chatManager = new ChatManager({
   fileInputButtonId: 'fileInput',
   onUserInput: handleUserInput,
   onUpload: handleUpload
+});
+
+require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' } });
+
+let editor;
+require(['vs/editor/editor.main'], function() {
+  editor = monaco.editor.create(document.getElementById('monacoEditor'), {
+        value: "# Schreibe hier deinen Python-Code",
+        language: 'python',
+        theme: 'vs-dark',
+        automaticLayout: true,
+    });
 });
