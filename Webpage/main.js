@@ -8,11 +8,28 @@ const workerManager = new WorkerManager("./webworker/webworker.js");
 console.log("Initialisiere Worker...");
 await workerManager.initialize();
 
+// Python example
+document.getElementById("python-run-example-button").addEventListener("click", async () => {
+
+  console.log("Lade Python-Skript...");
+  const response = await fetch("webworker/example.py");
+  const pyScript = await response.text();
+
+  console.log("Führe Python-Skript aus...");
+  try {
+    const result = await workerManager.runScript(pyScript, Output);
+    console.log("Ergebnis des Python-Skripts:", result);
+  } catch (error) {
+    console.error("Fehler beim Ausführen des Skripts:", error.message);
+  }
+});
+
+// Python user Code
 document.getElementById("python-run-button").addEventListener("click", async () => {
 
   console.log("Lade Python-Skript...");
-  const response = await fetch("webworker/script.py");
-  const pyScript = await response.text();
+  
+  const pyScript = document.getElementById("largeTextInput").value
 
   console.log("Führe Python-Skript aus...");
   try {
