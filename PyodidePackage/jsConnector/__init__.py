@@ -20,11 +20,6 @@ def output(text):
     send_message("info", text)
 
 def send_message(message_type, content):
-    """
-    Sendet eine Nachricht im JSON-Format.
-    :param message_type: Der Typ der Nachricht (z.B. 'question', 'info', 'error')
-    :param content: Der Inhalt der Nachricht
-    """
     message = {
         "type": message_type,
         "content": content
