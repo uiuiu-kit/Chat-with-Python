@@ -20,32 +20,16 @@ self.onmessage = async (event) => {
       pyodide.setStdout({ batched: (msg) => processPythonOutput(msg, id) });
 
       // Run Python script
-      currentGenerator = pyodide.runPython(script);
-      handleGenerator(currentGenerator, id);
+      const result = await pyodide.runPythonAsync(script);
+      self.postMessage({ id, status: "success", message: result });
     } catch (error) {
       self.postMessage({ id, status: "error", message: error.message });
     }
   } else if (type === "USER_INPUT") {
-    if (currentGenerator) {
-      handleGenerator(currentGenerator, id, data);
-    }
+    const pythonBytes = pyodide.toPy(data);
+    pyodide.globals.set("user_input", pythonBytes);
   }
 };
-
-function handleGenerator(generator, id, input = null) {
-  let result;
-  try {
-    // Weiter mit optionalem Input
-    result = input ? generator.next(input) : generator.next();
-  } catch (error) {
-    self.postMessage({ id, status: "error", message: error.message });
-    return;
-  }
-
-  if (result.done) {
-    self.postMessage({ id, status: "success", message: result.value });
-  }
-}
 
 function processPythonOutput(text, id) {
   const trimmedText = text.trim();

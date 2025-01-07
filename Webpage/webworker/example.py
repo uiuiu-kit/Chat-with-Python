@@ -4,19 +4,19 @@ import jsConnector
 # output(text)
 # get_input(question)
 
-def img_demo():
+async def img_demo():
     jsConnector.output("Start")  # Informiert über den Start
-    img = yield from jsConnector.get_input("Lade ein Bild hoch")  # Wartet auf Benutzerinput
+    img = await jsConnector.get_input("Lade ein Bild hoch")  # Wartet auf Benutzerinput
     jsConnector.output(f"Die Größe des Bildes ist {img.size}!")  # Bildinformationen
     jsConnector.output("Fertig!")  # Ende der Verarbeitung
 
-def text_demo():
+async def text_demo():
     jsConnector.output("Start")
-    name = yield from jsConnector.get_input("Wie heißt du?")
+    name = await jsConnector.get_input("Wie heißt du?")
     jsConnector.output(f"Hallo {name}")
 
-def main():
-    yield from text_demo()
+async def main():
+    await text_demo()
     return "Fertig"
 
 main()
