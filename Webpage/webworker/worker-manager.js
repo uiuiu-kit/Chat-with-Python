@@ -45,6 +45,13 @@ export class WorkerManager {
       }
     }
 
+    getUpload(uploadedData) {
+      if (this.waitingInput) {
+        this.sendMessage({type: "USER_UPLOAD", data: uploadedData})
+        this.waitingInput = false
+      }
+    }
+
     async initialize() {
       return this.sendMessage({ type: "INIT" });
     }

@@ -2,25 +2,33 @@ from PIL import Image
 from io import BytesIO
 import json
 import asyncio
-import js
 
-user_input = None 
+# Globales Event und Input-Variable
+user_input_event = asyncio.Event()
+user_input = None
+
 
 async def get_input(question):
-    send_message("question", question)
     global user_input
-    while True:
-        if user_input:
-            break
-        await asyncio.sleep(0.1)
+    send_message("question", question)
+    
+    # Warte, bis das Event gesetzt wird
+    await user_input_event.wait()
+
+    # Sobald das Event gesetzt ist, verarbeite den Input
     processed_input = process_input(user_input)
+    
+    # Input zurücksetzen
     user_input = None
+    user_input_event.clear()
+
     return processed_input
 
 def process_input(data):
     if isinstance(data, str):
         return data
-    elif isinstance(data, bytes):
+    elif isinstance(data, memoryview):
+    
         byte_stream = BytesIO(data)
         image = Image.open(byte_stream)
         return image
@@ -36,3 +44,9 @@ def send_message(message_type, content):
         "content": content
     }
     print(json.dumps(message))
+
+# Funktion, um den User Input aus dem WebWorker zu setzen
+def set_user_input(input_data):
+    global user_input
+    user_input = input_data
+    user_input_event.set()

@@ -1,8 +1,12 @@
+# example.py
+
 import jsConnector
 
 # Befehlsliste
 # output(text)
 # get_input(question)
+
+user_input = None
 
 async def img_demo():
     jsConnector.output("Start")  # Informiert über den Start
@@ -16,7 +20,7 @@ async def text_demo():
     jsConnector.output(f"Hallo {name}")
 
 async def main():
-    await text_demo()
+    await img_demo()
     return "Fertig"
 
 main()

@@ -3,7 +3,6 @@
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.23.0/full/pyodide.js");
 
 let pyodide;
-let currentGenerator = null;
 
 self.onmessage = async (event) => {
   const { type, script, id, data } = event.data;
@@ -12,7 +11,7 @@ self.onmessage = async (event) => {
     pyodide = await loadPyodide();
     await pyodide.loadPackage(["pillow", "micropip"]);
     const micropip = pyodide.pyimport("micropip");
-    await micropip.install('jsConnector-1.0.0-py3-none-any.whl');
+    await micropip.install('jsConnector-1.1.0-py3-none-any.whl');
     self.postMessage({ id, status: "initialized" });
   } else if (type === "RUN") {
     try {
@@ -27,9 +26,25 @@ self.onmessage = async (event) => {
     }
   } else if (type === "USER_INPUT") {
     const pythonBytes = pyodide.toPy(data);
-    pyodide.globals.set("user_input", pythonBytes);
+    pyodide.globals.set("user_input_data", pythonBytes);
+    await pyodide.runPythonAsync("jsConnector.set_user_input(user_input_data)");
+    const readback = pyodide.globals.get("user_input_data");
+    console.log("set_user_input übergeben", readback)
+  } else if (type === "USER_UPLOAD") {
+    const processed_data = await processUpload(data)
+    pyodide.globals.set("user_input_data", processed_data);
+    await pyodide.runPythonAsync("jsConnector.set_user_input(user_input_data)");
+    const readback = pyodide.globals.get("user_input_data");
+    console.log(readback, "an pyodide übergeben")
   }
 };
+
+async function processUpload(data) {
+  const arrayBuffer = await data.arrayBuffer();
+  const uint8Array = new Uint8Array(arrayBuffer);
+  const pythonBytes = pyodide.toPy(uint8Array);
+  return pythonBytes
+}
 
 function processPythonOutput(text, id) {
   const trimmedText = text.trim();

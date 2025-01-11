@@ -45,19 +45,11 @@ function Output(prompt) {
 }
 
 async function handleUpload(upload) {
-  console.log("Upload verarbeiten", upload.name)
-  try {
-    const arrayBuffer = await upload.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
-    workerManager.getInput(uint8Array)
-  } catch (error) {
-      console.error("Fehler beim Lesen des ArrayBuffers:", error);
-  }
+  workerManager.getUpload(upload)
 }
 
 // Funktion, die aufgerufen wird, wenn der Nutzer etwas eingibt
-function handleUserInput(input, ) {
-  console.log("Nutzereingabe verarbeitet:", input);
+function handleUserInput(input, ) {;
   workerManager.getInput(input)
 }
 
