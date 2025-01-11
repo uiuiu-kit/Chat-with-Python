@@ -27,7 +27,7 @@ export class WorkerManager {
         } else if (status === "question") {
           this.waitingInput = true;
         }
-        if (["info", "question"].includes(status)) {
+        if (["info", "question", "raw_output"].includes(status)) {
           if (Output) {
             Output(message)
           }
