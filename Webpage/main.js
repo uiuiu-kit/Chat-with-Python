@@ -40,8 +40,8 @@ document.getElementById("python-run-button").addEventListener("click", async () 
   }
 });
 
-function Output(prompt) {
-  chatManager.chatOutput(prompt)
+function Output(message, line_no) {
+  chatManager.chatOutput(message, line_no)
 }
 
 async function handleUpload(upload) {

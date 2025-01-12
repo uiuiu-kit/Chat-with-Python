@@ -15,7 +15,7 @@ class ChatManager {
     }
 
     // Methode für Chat-Ausgabe
-    chatOutput(message) {
+    chatOutput(message, line_no) {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-start');
 
@@ -30,7 +30,16 @@ class ChatManager {
         messageElement.classList.add('small', 'p-2', 'ms-3', 'mb-1', 'rounded-3', 'bg-body-tertiary');
         messageElement.textContent = message;
 
+        // Zeilennummer hinzufügen
+        const lineNumberElement = document.createElement('span');
+        lineNumberElement.classList.add('line-number');
+        lineNumberElement.style.fontSize = '0.75rem';
+        lineNumberElement.style.color = '#6c757d';  // Grauer Farbton
+        lineNumberElement.style.alignSelf = 'flex-end';  // Zeilennummer rechts ausrichten
+        lineNumberElement.textContent = `#${line_no}`;
+
         textContainer.appendChild(messageElement);
+        textContainer.appendChild(lineNumberElement);
         messageContainer.appendChild(avatar);
         messageContainer.appendChild(textContainer);
 

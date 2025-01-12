@@ -10,7 +10,7 @@ export class WorkerManager {
     }
   
     handleMessage(event) {
-      const { id, status, message} = event.data;
+      const { id, status, message, line_no} = event.data;
       if (this.callbacks[id]) {
         const { resolve, reject, Output } = this.callbacks[id]; //output hinzufügen
         if (status === "initialized") {
@@ -29,7 +29,7 @@ export class WorkerManager {
         }
         if (["info", "question", "raw_output"].includes(status)) {
           if (Output) {
-            Output(message)
+            Output(message, line_no)
           }
         }
         if (["error", "succes"].includes(status)) {

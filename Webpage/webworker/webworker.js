@@ -11,7 +11,7 @@ self.onmessage = async (event) => {
     pyodide = await loadPyodide();
     await pyodide.loadPackage(["pillow", "micropip"]);
     const micropip = pyodide.pyimport("micropip");
-    await micropip.install('jsConnector-1.1.0-py3-none-any.whl');
+    await micropip.install('jsConnector-1.1.2-py3-none-any.whl');
     self.postMessage({ id, status: "initialized" });
   } else if (type === "RUN") {
     try {
@@ -52,7 +52,7 @@ function processPythonOutput(text, id) {
   
   try {
     const message = JSON.parse(trimmedText);
-    self.postMessage({ id, status: message.type, message: message.content });
+    self.postMessage({ id, status: message.type, message: message.content, code_name: message.code_name, line_no: message.line_no });
   } catch (error) {
     // Fallback: Sende unformatierte Ausgaben
     self.postMessage({ id, status: "raw_output", message: trimmedText });

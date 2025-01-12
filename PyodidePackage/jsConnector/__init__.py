@@ -39,11 +39,24 @@ def output(text):
     send_message("info", text)
 
 def send_message(message_type, content):
+    code_name, line_no = get_caller_info()
     message = {
         "type": message_type,
-        "content": content
+        "content": content,
+        "code_name": code_name,
+        "line_no": line_no
     }
     print(json.dumps(message))
+
+# Funktion, um die Zeile und den Befehl zu bestimmen der einen Output erzeugt hat
+def get_caller_info():
+    import inspect
+    frame = inspect.currentframe()
+    try:
+        frame = frame.f_back.f_back.f_back
+        return frame.f_code.co_name, frame.f_lineno
+    except:
+        return None, -1
 
 # Funktion, um den User Input aus dem WebWorker zu setzen
 def set_user_input(input_data):
