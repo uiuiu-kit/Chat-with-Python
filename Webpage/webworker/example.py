@@ -2,12 +2,6 @@
 
 import jsConnector
 
-# Befehlsliste
-# output(text)
-# get_input(question)
-
-user_input = None
-
 async def img_demo():
     jsConnector.output("Start")  # Informiert über den Start
     img = await jsConnector.get_input("Lade ein Bild hoch")  # Wartet auf Benutzerinput
