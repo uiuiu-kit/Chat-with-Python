@@ -15,6 +15,8 @@ document.getElementById("python-run-example-button").addEventListener("click", a
   const response = await fetch("webworker/example.py");
   const pyScript = await response.text();
 
+  chatManager.newExecution()
+
   console.log("Führe Python-Skript aus...");
   try {
     const result = await workerManager.runScript(pyScript, Output);
@@ -30,6 +32,8 @@ document.getElementById("python-run-button").addEventListener("click", async () 
   console.log("Lade Python-Skript...");
 
   const pyScript = editor.getValue()
+
+  chatManager.newExecution()
 
   console.log("Führe Python-Skript aus...");
   try {

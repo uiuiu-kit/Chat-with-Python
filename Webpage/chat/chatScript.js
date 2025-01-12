@@ -9,6 +9,7 @@ class ChatManager {
         // Callback für Nutzer-Eingaben
         this.onUserInput = onUserInput;
         this.onUpload = onUpload
+        this.executionCounter = 1
 
         // Listener initialisieren
         this.initializeListeners();
@@ -80,6 +81,25 @@ class ChatManager {
         messageContainer.appendChild(avatar);
     
         this.chatContainer.appendChild(messageContainer);
+    }
+
+    newExecution() {
+        // Erstelle den Haupt-Div-Container
+        const dividerContainer = document.createElement('div');
+        dividerContainer.classList.add('divider', 'd-flex', 'align-items-center', 'mb-4');
+
+        // Erstelle das <p>-Element für die Text "Execution number"
+        const dividerText = document.createElement('p');
+        dividerText.classList.add('text-center', 'mx-3', 'mb-0');
+        dividerText.style.color = '#a2aab7';
+        dividerText.textContent = this.executionCounter + ' Execution';
+
+        // Füge das <p>-Element in den Container ein
+        dividerContainer.appendChild(dividerText);
+
+        // Füge den Divider dem Chat-Container hinzu
+        this.chatContainer.appendChild(dividerContainer);
+        this.executionCounter += 1;
     }
 
     // Eingabe verarbeiten
