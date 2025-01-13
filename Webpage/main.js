@@ -5,12 +5,12 @@ import ChatManager from './chat/chatScript.js';
 // ------------------ Button Managemend -----------------------------------
 
 // Klick auf den sichtbaren Button löst das versteckte Datei-Upload-Input aus
-document.getElementById('customUploadButton').addEventListener('click', function() {
+document.getElementById('customUploadCodeButton').addEventListener('click', function() {
   document.getElementById('uploadButton').click();
 });
 
 // Optional: Datei auswählen und den Dateinamen in der Konsole anzeigen
-document.getElementById('uploadButton').addEventListener('change', function() {
+document.getElementById('uploadCodeButton').addEventListener('change', function() {
   const file = this.files[0];
   if (file) {
       console.log('Hochgeladene Datei:', file.name);
@@ -26,7 +26,7 @@ console.log("Initialisiere Worker...");
 await workerManager.initialize();
 
 // Python user Code
-document.getElementById("python-run-button").addEventListener("click", async () => {
+document.getElementById("pythonRunButton").addEventListener("click", async () => {
 
   console.log("Lade Python-Skript...");
 
