@@ -29,13 +29,13 @@ self.onmessage = async (event) => {
     pyodide.globals.set("user_input_data", pythonBytes);
     await pyodide.runPythonAsync("jsConnector.set_user_input(user_input_data)");
     const readback = pyodide.globals.get("user_input_data");
-    console.log("set_user_input übergeben", readback)
+    console.log("set_user_input übergeben", readback);
   } else if (type === "USER_UPLOAD") {
-    const processed_data = await processUpload(data)
+    const processed_data = await processUpload(data);
     pyodide.globals.set("user_input_data", processed_data);
     await pyodide.runPythonAsync("jsConnector.set_user_input(user_input_data)");
     const readback = pyodide.globals.get("user_input_data");
-    console.log(readback, "an pyodide übergeben")
+    console.log(readback, "an pyodide übergeben");
   }
 };
 
@@ -43,7 +43,7 @@ async function processUpload(data) {
   const arrayBuffer = await data.arrayBuffer();
   const uint8Array = new Uint8Array(arrayBuffer);
   const pythonBytes = pyodide.toPy(uint8Array);
-  return pythonBytes
+  return pythonBytes;
 }
 
 function processPythonOutput(text, id) {

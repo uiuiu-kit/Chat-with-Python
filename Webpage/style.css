@@ -1,0 +1,14 @@
+.icon {
+    font-size: 24px;
+    cursor: pointer;
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+.icon.active {
+    color: red;
+}
+
+.icon.inactive {
+    color: green;
+}

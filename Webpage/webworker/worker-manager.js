@@ -7,6 +7,7 @@ export class WorkerManager {
       this.worker.onmessage = (event) => this.handleMessage(event);
       this.nextId = 0;
       this.waitingInput = false;
+      this.pyodideBussy = false;
     }
   
     handleMessage(event) {
@@ -26,13 +27,15 @@ export class WorkerManager {
           console.log("UM:", message)
         } else if (status === "question") {
           this.waitingInput = true;
+          this.pyodideBussy = false;
         }
         if (["info", "question", "raw_output"].includes(status)) {
           if (Output) {
-            Output(message, line_no)
+            Output(message, line_no);
           }
         }
-        if (["error", "succes"].includes(status)) {
+        if (["error", "success"].includes(status)) {
+          this.pyodideBussy = false;
           delete this.callbacks[id];
         }
       }
@@ -41,14 +44,16 @@ export class WorkerManager {
     getInput(inputValue) {
       if (this.waitingInput) {
         this.sendMessage({type: "USER_INPUT", data: inputValue})
-        this.waitingInput = false
+        this.waitingInput = false;
+        this.pyodideBussy = true;
       }
     }
 
     getUpload(uploadedData) {
       if (this.waitingInput) {
         this.sendMessage({type: "USER_UPLOAD", data: uploadedData})
-        this.waitingInput = false
+        this.waitingInput = false;
+        this.pyodideBussy = true;
       }
     }
 
@@ -57,6 +62,7 @@ export class WorkerManager {
     }
   
     async runScript(script, Output) {
+      this.pyodideBussy = true;
       return this.sendMessage({ type: "RUN", script, id :1 }, Output);
     }
   

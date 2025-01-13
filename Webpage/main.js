@@ -6,7 +6,7 @@ import ChatManager from './chat/chatScript.js';
 
 // Klick auf den sichtbaren Button löst das versteckte Datei-Upload-Input aus
 document.getElementById('customUploadCodeButton').addEventListener('click', function() {
-  document.getElementById('uploadButton').click();
+  document.getElementById('uploadCodeButton').click();
 });
 
 // Optional: Datei auswählen und den Dateinamen in der Konsole anzeigen
@@ -16,6 +16,21 @@ document.getElementById('uploadCodeButton').addEventListener('change', function(
       console.log('Hochgeladene Datei:', file.name);
   }
 });
+
+function updateIcon() {
+  const icon = document.getElementById('statusIcon');
+  if (workerManager.pyodideBussy) {
+      icon.textContent = '🔴'; // Icon für "true"
+      icon.classList.add('active');
+      icon.classList.remove('inactive');
+  } else {
+      icon.textContent = '🟢'; // Icon für "false"
+      icon.classList.add('inactive');
+      icon.classList.remove('active');
+  }
+}
+
+setInterval(updateIcon, 500);
 
 // ------------------ Webworker Funktionalität ----------------------------
 
@@ -30,9 +45,9 @@ document.getElementById("pythonRunButton").addEventListener("click", async () =>
 
   console.log("Lade Python-Skript...");
 
-  const pyScript = editor.getValue()
+  const pyScript = editor.getValue();
 
-  chatManager.newExecution()
+  chatManager.newExecution();
 
   console.log("Führe Python-Skript aus...");
   try {
@@ -46,16 +61,16 @@ document.getElementById("pythonRunButton").addEventListener("click", async () =>
 // --------------- Chat Funktionalität ----------------------
 
 function Output(message, line_no) {
-  chatManager.chatOutput(message, line_no)
+  chatManager.chatOutput(message, line_no);
 }
 
 async function handleUpload(upload) {
-  workerManager.getUpload(upload)
+  workerManager.getUpload(upload);
 }
 
 // Funktion, die aufgerufen wird, wenn der Nutzer etwas eingibt
 function handleUserInput(input, ) {;
-  workerManager.getInput(input)
+  workerManager.getInput(input);
 }
 
 // ChatManager-Instanz erstellen
@@ -81,7 +96,7 @@ function downloadCodeAsFile(filename, content) {
 }
 
 // Button für das Herunterladen des Codes
-document.getElementById('downloadButton').addEventListener('click', function() {
+document.getElementById('downloadCodeButton').addEventListener('click', function() {
   const code = editor.getValue();
   downloadCodeAsFile('code.py', code);
 });
@@ -91,7 +106,7 @@ function loadCodeIntoEditor(fileContent) {
   editor.setValue(fileContent);
 }
 
-document.getElementById('uploadButton').addEventListener('change', function(event) {
+document.getElementById('uploadCodeButton').addEventListener('change', function(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
 

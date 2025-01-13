@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
     <link rel="stylesheet" href="chat/chat.css">
+    <link rel="stylesheet" href="style.css">
     <script type="module" src="main.js"></script>
 </head>
 <body>
@@ -25,7 +26,7 @@
                           <div id="monacoEditor" style="height: 400px; width: 100%;"></div>
                         </div>
                         <!-- Verstecktes Datei-Upload-Input -->
-                        <input type="file" id="uploadButton" accept=".py" style="display: none;">
+                        <input type="file" id="uploadCodeButton" accept=".py" style="display: none;">
                         <!-- Sichtbarer Button im Bootstrap-Stil -->
                         <button class="btn btn-primary mt-3" id="customUploadCodeButton">Upload Python File</button>
                         <button class="btn btn-primary mt-3" id="downloadCodeButton">Download Code</button>
@@ -38,6 +39,7 @@
                   <div class="card" id="chatWindow">
                       <div class="card-header d-flex justify-content-between align-items-center p-3">
                           <h5 class="mb-0">Chat</h5>
+                          <div id="statusIcon" class="icon">🟢</div>
                       </div>
                       <div class="card-body" data-mdb-perfect-scrollbar-init style="position: relative; height: 400px" id="chat">
                           <div id="chat-container"></div>
