@@ -9,7 +9,19 @@ export class WorkerManager {
       this.waitingInput = false;
       this.pyodideBussy = false;
     }
-  
+    
+    newWorker(workerPath) {
+      this.worker.terminate()
+      this.worker = null;
+      this.worker =  new Worker(workerPath)
+      this.callbacks = {};
+      this.worker.onmessage = (event) => this.handleMessage(event);
+      this.nextId = 0;
+      this.waitingInput = false;
+      this.pyodideBussy = false;
+      console.log("Neuer Worker")
+    }
+
     handleMessage(event) {
       const { id, status, message, line_no} = event.data;
       if (this.callbacks[id]) {

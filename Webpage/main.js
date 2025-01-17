@@ -17,6 +17,10 @@ document.getElementById('uploadCodeButton').addEventListener('change', function(
   }
 });
 
+document.getElementById('stopCodeButton').addEventListener('click', function() {
+  newWorker()
+});
+
 function updateIcon() {
   const icon = document.getElementById('statusIcon');
   if (workerManager.pyodideBussy) {
@@ -39,6 +43,11 @@ const workerManager = new WorkerManager("./webworker/webworker.js");
 
 console.log("Initialisiere Worker...");
 await workerManager.initialize();
+
+async function newWorker() {
+  workerManager.newWorker("./webworker/webworker.js")
+  await workerManager.initialize()
+}
 
 // Python user Code
 document.getElementById("pythonRunButton").addEventListener("click", async () => {
