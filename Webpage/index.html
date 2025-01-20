@@ -8,7 +8,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
     <link rel="stylesheet" href="chat/chat.css">
-    <link rel="stylesheet" href="style.css">
     <script type="module" src="main.js"></script>
 </head>
 <body>
@@ -28,7 +27,7 @@
                         <!-- Verstecktes Datei-Upload-Input -->
                         <input type="file" id="uploadCodeButton" accept=".py" style="display: none;">
                         <!-- Sichtbarer Button im Bootstrap-Stil -->
-                        <button class="btn btn-primary mt-3" id="customUploadCodeButton">Upload Python File</button>
+                        <button class="btn btn-primary mt-3" id="customUploadCodeButton">Upload Python Code</button>
                         <button class="btn btn-primary mt-3" id="downloadCodeButton">Download Code</button>
                         <button class="btn btn-primary mt-3" id="pythonRunButton">Run python</button>
                         <button class="btn btn-primary mt-3" id="stopCodeButton">Stop python</button>
@@ -40,13 +39,27 @@
                   <div class="card" id="chatWindow">
                       <div class="card-header d-flex justify-content-between align-items-center p-3">
                           <h5 class="mb-0">Chat</h5>
-                          <div id="statusIcon" class="icon">🟢</div>
                       </div>
                       <div class="card-body" data-mdb-perfect-scrollbar-init style="position: relative; height: 400px" id="chat">
                           <div id="chat-container"></div>
                       </div>
                       <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
-                          <img src="chat/chat_img/user.png" alt="avatar 3" style="width: 40px; height: 100%;">
+                        <div id="status-display" style="width: 40px; height: 100%;">
+                            <img id="await-symbol" src="chat/chat_img/await_input.png" alt="awaiting input" style="width: 40px; height: 100%; display: none;">
+                            <div id="loading-symbol" style="display: none;">
+                                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 40px; height: 40px;">
+                                    <circle cx="50" cy="50" r="45" stroke-width="10" stroke="#ccc" fill="none" stroke-dasharray="283" stroke-dashoffset="75">
+                                        <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="1s" repeatCount="indefinite" />
+                                    </circle>
+                                </svg>
+                            </div>
+                            <div id="ready-symbol" style="display: none;">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 40px; height: 40px;">
+                                    <circle cx="12" cy="12" r="10" fill="#4caf50" />
+                                    <path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </div>                        
                           <input type="text" class="form-control form-control-lg" id="exampleFormControlInput1" placeholder="Type message">
                           <input name="datei" type="file" id="fileInput" accept="image/*" style="display: none;">
                           <label for="fileInput" class="ms-1 text-muted" style="cursor: pointer;">

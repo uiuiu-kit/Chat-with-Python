@@ -2,23 +2,21 @@
 
 export class WorkerManager {
     constructor(workerPath) {
+      this.worker_status = "loading"
       this.worker = new Worker(workerPath);
       this.callbacks = {};
       this.worker.onmessage = (event) => this.handleMessage(event);
       this.nextId = 0;
-      this.waitingInput = false;
-      this.pyodideBussy = false;
     }
     
     newWorker(workerPath) {
+      this.worker_status = "loading"
       this.worker.terminate()
       this.worker = null;
       this.worker =  new Worker(workerPath)
       this.callbacks = {};
       this.worker.onmessage = (event) => this.handleMessage(event);
       this.nextId = 0;
-      this.waitingInput = false;
-      this.pyodideBussy = false;
       console.log("Neuer Worker")
     }
 
@@ -28,6 +26,7 @@ export class WorkerManager {
         const { resolve, reject, Output } = this.callbacks[id]; //output hinzufügen
         if (status === "initialized") {
           console.log("Worker erfolgreich initialisiert!");
+          this.worker_status = "ready"
           if (this.callbacks[id]) {
             this.callbacks[id].resolve("initialized");
           }
@@ -38,8 +37,7 @@ export class WorkerManager {
         } else if (status === "unknown_message") {
           console.log("UM:", message)
         } else if (status === "question") {
-          this.waitingInput = true;
-          this.pyodideBussy = false;
+          this.worker_status = "await input"
         }
         if (["info", "question", "raw_output"].includes(status)) {
           if (Output) {
@@ -47,25 +45,23 @@ export class WorkerManager {
           }
         }
         if (["error", "success"].includes(status)) {
-          this.pyodideBussy = false;
+          this.worker_status = "ready";
           delete this.callbacks[id];
         }
       }
     }
   
     getInput(inputValue) {
-      if (this.waitingInput) {
+      if (this.worker_status == "await input") {
         this.sendMessage({type: "USER_INPUT", data: inputValue})
-        this.waitingInput = false;
-        this.pyodideBussy = true;
+        this.worker_status = "loading"
       }
     }
 
     getUpload(uploadedData) {
-      if (this.waitingInput) {
+      if (this.worker_status == "await input") {
         this.sendMessage({type: "USER_UPLOAD", data: uploadedData})
-        this.waitingInput = false;
-        this.pyodideBussy = true;
+        this.worker_status = "loading"
       }
     }
 
@@ -74,7 +70,7 @@ export class WorkerManager {
     }
   
     async runScript(script, Output) {
-      this.pyodideBussy = true;
+      this.worker_status = "loading"
       return this.sendMessage({ type: "RUN", script, id :1 }, Output);
     }
   

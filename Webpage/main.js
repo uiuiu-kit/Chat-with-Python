@@ -22,15 +22,20 @@ document.getElementById('stopCodeButton').addEventListener('click', function() {
 });
 
 function updateIcon() {
-  const icon = document.getElementById('statusIcon');
-  if (workerManager.pyodideBussy) {
-      icon.textContent = '🔴'; // Icon für "true"
-      icon.classList.add('active');
-      icon.classList.remove('inactive');
+  const loadingSymbol = document.getElementById('loading-symbol');
+  const readySymbol = document.getElementById('ready-symbol');
+  const awaitSymbol = document.getElementById('await-symbol')
+
+  loadingSymbol.style.display = 'none';
+  awaitSymbol.style.display = 'none'
+  readySymbol.style.display = 'none';
+
+  if (workerManager.worker_status == 'loading') {
+    loadingSymbol.style.display = 'block';
+  } else if (workerManager.worker_status == 'await input') {
+    awaitSymbol.style.display = 'block';
   } else {
-      icon.textContent = '🟢'; // Icon für "false"
-      icon.classList.add('inactive');
-      icon.classList.remove('active');
+    readySymbol.style.display = 'block';
   }
 }
 
