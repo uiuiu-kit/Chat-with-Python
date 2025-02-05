@@ -1,7 +1,0 @@
-setup.py
-jsConnector/__init__.py
-jsConnector.egg-info/PKG-INFO
-jsConnector.egg-info/SOURCES.txt
-jsConnector.egg-info/dependency_links.txt
-jsConnector.egg-info/requires.txt
-jsConnector.egg-info/top_level.txt

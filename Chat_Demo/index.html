@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pyodide Worker Runner</title>
+</head>
+<body>
+  <h1>Pyodide Worker Runner Demo</h1>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Python-Chat</title>
+    <link rel="icon" href="./images/favicon.ico">
+    <link rel="stylesheet" href="/src/chat/chat.css">
+    <link rel="stylesheet" href="/src/style.css">
+    <script type="module" src="/src/main.ts"></script>
+</head>
+<body>
+    <section>
+        <div class="container py-5">
+            <div class="row">
+              <!-- Linke Spalte: Großes Texteingabefeld -->
+              <div class="col-md-5 col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Python-Code-Eingabe</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-footer p-3">
+                          <div id="monacoEditor" style="height: 400px; width: 100%;"></div>
+                        </div>
+                        <!-- Verstecktes Datei-Upload-Input -->
+                        <input type="file" id="uploadCodeButton" accept=".py" style="display: none;">
+                        <!-- Sichtbarer Button im Bootstrap-Stil -->
+                        <button class="btn btn-primary mt-3" id="customUploadCodeButton">Upload Python Code</button>
+                        <button class="btn btn-primary mt-3" id="downloadCodeButton">Download Code</button>
+                        <button class="btn btn-primary mt-3" id="pythonRunButton">Run python</button>
+                        <button class="btn btn-primary mt-3" id="stopCodeButton">Stop python</button>
+                    </div>
+                </div>
+              </div>
+                <!-- Rechte Spalte: Chat -->
+                <div class="col-md-7 col-lg-6">
+                  <div class="card" id="chatWindow">
+                      <div class="card-header d-flex justify-content-between align-items-center p-3">
+                          <h5 class="mb-0">Chat</h5>
+                      </div>
+                      <div class="card-body" data-mdb-perfect-scrollbar-init style="position: relative; height: 400px" id="chat">
+                          <div id="chat-container"></div>
+                      </div>
+                      <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
+                        <div id="status-display" style="width: 40px; height: 100%;">
+                            <img id="await-symbol" src="chat/chat_img/await_input.png" alt="awaiting input" style="width: 40px; height: 100%; display: none;">
+                            <div id="loading-symbol" style="display: none;">
+                                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 40px; height: 40px;">
+                                    <circle cx="50" cy="50" r="45" stroke-width="10" stroke="#ccc" fill="none" stroke-dasharray="283" stroke-dashoffset="75">
+                                        <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="1s" repeatCount="indefinite" />
+                                    </circle>
+                                </svg>
+                            </div>
+                            <div id="ready-symbol" style="display: none;">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 40px; height: 40px;">
+                                    <circle cx="12" cy="12" r="10" fill="#4caf50" />
+                                    <path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </div>                        
+                          <input type="text" class="form-control form-control-lg" id="exampleFormControlInput1" placeholder="Type message">
+                          <input name="datei" type="file" id="fileInput" accept="image/*" style="display: none;">
+                          <label for="fileInput" class="ms-1 text-muted" style="cursor: pointer;">
+                              <i class="fas fa-paperclip"></i>
+                          </label>
+                          <a class="ms-3" href="#!" id="sendMessage"><i class="fas fa-paper-plane"></i></a>
+                      </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

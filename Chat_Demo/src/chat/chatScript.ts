@@ -1,22 +1,36 @@
-class ChatManager {
-    constructor({ chatContainerId, inputFieldId, sendButtonId, fileInputButtonId, onUserInput = null, onUpload = null }) {
-        // DOM-Elemente und Konfigurationsparameter speichern
+interface ChatManagerOptions {
+    chatContainerId: string;
+    inputFieldId: string;
+    sendButtonId: string;
+    fileInputButtonId: string;
+    onInput?: (input: string) => void;
+    onUpload?: (file: File) => void;
+}
+
+export class ChatManager {
+    private chatContainer: HTMLElement | null;
+    private inputField: HTMLInputElement | null;
+    private sendButton: HTMLButtonElement | null;
+    private fileInputButton: HTMLInputElement | null;
+    private onInput: ((input: string) => void) | undefined;
+    private onUpload: ((file: File) => void) | undefined;
+    private executionCounter: number;
+    
+    constructor({ chatContainerId, inputFieldId, sendButtonId, fileInputButtonId, onInput, onUpload }: ChatManagerOptions) {
         this.chatContainer = document.getElementById(chatContainerId);
-        this.inputField = document.getElementById(inputFieldId);
-        this.sendButton = document.getElementById(sendButtonId);
-        this.fileInputButton = document.getElementById(fileInputButtonId);
+        this.inputField = document.getElementById(inputFieldId) as HTMLInputElement;
+        this.sendButton = document.getElementById(sendButtonId) as HTMLButtonElement;
+        this.fileInputButton = document.getElementById(fileInputButtonId) as HTMLInputElement;
 
-        // Callback für Nutzer-Eingaben
-        this.onUserInput = onUserInput;
-        this.onUpload = onUpload
-        this.executionCounter = 1
+        this.onInput = onInput;
+        this.onUpload = onUpload;
+        this.executionCounter = 1;
 
-        // Listener initialisieren
         this.initializeListeners();
     }
 
     // Methode für Chat-Ausgabe
-    chatOutput(message, line_no) {
+    chatOutput(message: string, line_no: number): void {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-start', 'align-items-center');
 
@@ -43,12 +57,11 @@ class ChatManager {
         messageContainer.appendChild(textContainer);
 
         // Hauptcontainer in den Chat einfügen
-        this.chatContainer.appendChild(messageContainer);
+        this.chatContainer?.appendChild(messageContainer);
     }
 
-
     // Methode für Chat-Eingabe
-    chatInput(message) {
+    chatInput(message: string | File): void {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-4', 'pt-1');
 
@@ -61,7 +74,7 @@ class ChatManager {
             messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'text-white', 'rounded-3', 'bg-primary');
             messageElement.textContent = message;
             textContainer.appendChild(messageElement);
-        } else if (message.type == 'image/png' ) {
+        } else if (message instanceof File && message.type === 'image/png') {
             // Wenn Bild, Nachricht als Bild anzeigen
             const imageElement = document.createElement('img');
             imageElement.src = URL.createObjectURL(message); // Bildquelle (Base64 oder URL)
@@ -73,10 +86,10 @@ class ChatManager {
     
         messageContainer.appendChild(textContainer);
     
-        this.chatContainer.appendChild(messageContainer);
+        this.chatContainer?.appendChild(messageContainer);
     }
 
-    newExecution() {
+    newExecution(): void {
         // Erstelle den Haupt-Div-Container
         const dividerContainer = document.createElement('div');
         dividerContainer.classList.add('divider', 'd-flex', 'align-items-center', 'mb-4');
@@ -91,21 +104,21 @@ class ChatManager {
         dividerContainer.appendChild(dividerText);
 
         // Füge den Divider dem Chat-Container hinzu
-        this.chatContainer.appendChild(dividerContainer);
+        this.chatContainer?.appendChild(dividerContainer);
         this.executionCounter += 1;
     }
 
     // Eingabe verarbeiten
-    processInput() {
-        const input = this.inputField.value;
+    processInput(): void {
+        const input = this.inputField?.value;
 
-        if (input.trim()) {
+        if (input && input.trim()) {
             // Nutzer-Eingabe anzeigen
             this.chatInput(input);
 
             // Callback aufrufen, wenn definiert
-            if (typeof this.onUserInput === 'function') {
-                this.onUserInput(input);
+            if (this.onInput) {
+                this.onInput(input);
             }
 
             // Eingabefeld leeren
@@ -114,43 +127,55 @@ class ChatManager {
     }
 
     // Upload verarbeiten
-    processUpload() {
-        const upload = this.fileInputButton.files[0];
-        if (upload) {
-            // Nutzer-Eingabe anzeigen
-            this.chatInput(upload);
-
-            // Callback aufrufen, wenn definiert
-            if (typeof this.onUserInput === 'function') {
-                this.onUpload(upload);
+    processUpload(): void {
+        if(this.fileInputButton?.files){
+            const upload = this.fileInputButton.files[0];
+            if (upload) {
+                // Nutzer-Eingabe anzeigen
+                this.chatInput(upload);
+    
+                // Callback aufrufen, wenn definiert
+                if (this.onUpload) {
+                    this.onUpload(upload);
+                }
             }
+            
+            // Upload leeren
+            this.clearUpload();
         }
         
-        // Upload leeren
-        this.clearUpload();
     }
 
-    //// Upload leeren
-    clearUpload() {
-        this.fileInputButton.value = null;
+    // Upload leeren
+    clearUpload(): void {
+        if (this.fileInputButton) {
+            this.fileInputButton.value = '';
+        }
     }
 
     // Eingabefeld leeren
-    clearInput() {
-        this.inputField.value = '';
+    clearInput(): void {
+        if (this.inputField) {
+            this.inputField.value = '';
+        }
     }
 
     // Listener für Benutzerinteraktionen
-    initializeListeners() {
-        this.inputField.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                this.processInput();
-            }
-        });
+    initializeListeners(): void {
+        if (this.inputField) {
+            this.inputField.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    this.processInput();
+                }
+            });
+        }
 
-        this.sendButton.addEventListener('click', () => this.processInput());
-        this.fileInputButton.addEventListener('change', () => this.processUpload())
+        if (this.sendButton) {
+            this.sendButton.addEventListener('click', () => this.processInput());
+        }
+
+        if (this.fileInputButton) {
+            this.fileInputButton.addEventListener('change', () => this.processUpload());
+        }
     }
 }
-
-export default ChatManager;
