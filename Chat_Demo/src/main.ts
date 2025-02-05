@@ -26,10 +26,6 @@ await taskClient.call(
   taskClient.workerProxy.initPyodideRunner,
 );
 
-// get the code to execute
-const response = await fetch("./src/script.py");
-const code = await response.text();
-
 async function updateOutput(outputArr: Array<Object>) {
   for (const part of outputArr) {
     const type = part["type"]
@@ -38,6 +34,7 @@ async function updateOutput(outputArr: Array<Object>) {
       console.error(text);
     } else {
       console.log(text);
+      chatManager.chatOutput(text, 0)
     }
   }
 }
@@ -57,9 +54,9 @@ async function handleMain() {
   console.log('Main thread running');
   taskClient.writeMessage(result);
 }
-
-// pass code to webworker and run it
-const resultPromise = 
+async function runCode(code: string) {
+    // pass code to webworker and run it
+  const resultPromise = 
   await taskClient.call(
     taskClient.workerProxy.runCode,
     code,
@@ -68,11 +65,20 @@ const resultPromise =
     Comlink.proxy(handleMain),
 );
 
+}
+
 async function abortPyodide() {
   await taskClient.interrupt();
 }
 
 // ------------------ Button Management -----------------------------------
+
+document.getElementById('pythonRunButton')!.addEventListener('click', function() {
+  if (editor) {
+    const code = editor?.getValue()
+    runCode(code);
+  }
+})
 
 // Click on the visible button triggers the hidden file upload input
 document.getElementById('customUploadCodeButton')!.addEventListener('click', function() {
@@ -122,8 +128,7 @@ async function gotUpload(upload: File) {
   if (waitForUpload) {
     const arrayBuffer = await upload.arrayBuffer();
     const uint8Array = new Uint8Array(arrayBuffer);
-    const pythonBytes = pyodide.toPy(uint8Array);
-    taskClient.writeMessage(pythonBytes)
+    taskClient.writeMessage(uint8Array)
   } else {
     Output('Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.', 0);
   }
@@ -131,7 +136,7 @@ async function gotUpload(upload: File) {
 
 // Function called when the user inputs something
 async function gotInput(input: String) {
-  if (waitForUpload) {
+  if (waitForInput) {
     taskClient.writeMessage(input)
   } else {
     Output('Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.', 0);
@@ -158,7 +163,7 @@ const editorElement = document.getElementById('monacoEditor');
 
 if (editorElement) {
   editor = monaco.editor.create(editorElement, {
-    value: "console.log('Hello, Monaco!');",
+    value: "print('Hello, Monaco!');",
     language: "python",
     theme: "vs-dark",
   });
@@ -180,8 +185,8 @@ function downloadCodeAsFile(filename: string, content: string) {
 document.getElementById('downloadCodeButton')!.addEventListener('click', function() {
   if (editor) {
     const code = editor.getValue();
+    downloadCodeAsFile('code.py', code);
   }
-  downloadCodeAsFile('code.py', code);
 });
 
 function loadCodeIntoEditor(fileContent: string) {
