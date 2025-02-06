@@ -13,8 +13,10 @@ import {ChatManager} from './chat/chatScript';
 let channel = makeChannel();
 let pyodideWorker: Worker;
 let taskClient: any;
-let waitForInput: boolean;
-let waitForUpload: boolean;
+
+type executionState = "init" | "idle" | "running" | "awaitingInput" | "awaitingUpload";
+
+let curExecutionState: executionState = "init";
 
 // Setup The PyodideClient with my own worker
 pyodideWorker = new Worker(new URL("./pyodide-worker.ts", import.meta.url), {
@@ -26,12 +28,15 @@ await taskClient.call(
   taskClient.workerProxy.initPyodideRunner,
 );
 
+curExecutionState = "idle";
+
 async function updateOutput(outputArr: Array<Object>) {
   for (const part of outputArr) {
     const type = part["type"]
     const text = part["text"]
     if (["stderr", "traceback", "syntax_error"].includes(type)) {
       console.error(text);
+      chatManager.chatError(text, 0)
     } else {
       console.log(text);
       chatManager.chatOutput(text, 0)
@@ -40,13 +45,11 @@ async function updateOutput(outputArr: Array<Object>) {
 }
 
 async function handleInput(question: string, type: string = "string") {
-  console.log(question);
-  if (type == "string") {
-    waitForInput = true;
+  if (type = "string") {
+    curExecutionState = "awaitingInput"
   } else {
-    waitForUpload = true;
+    curExecutionState = "awaitingUpload"
   }
-  
 }
 
 async function handleMain() {
@@ -54,7 +57,29 @@ async function handleMain() {
   console.log('Main thread running');
   taskClient.writeMessage(result);
 }
+
+async function computeInput(input: string) {
+  if (curExecutionState == "awaitingInput") {
+    taskClient.writeMessage(input)
+    curExecutionState = "running"
+  } else {
+    Output('Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.', 0);
+  }
+}
+
+async function computeUpload(upload: File) {
+  if (curExecutionState == "awaitingUpload") {
+    const arrayBuffer = await upload.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    taskClient.writeMessage(uint8Array)
+    curExecutionState = "running"
+  } else {
+    Output('Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.', 0);
+  }
+}
+
 async function runCode(code: string) {
+  curExecutionState = "running"
     // pass code to webworker and run it
   const resultPromise = 
   await taskClient.call(
@@ -63,8 +88,8 @@ async function runCode(code: string) {
     Comlink.proxy(updateOutput),
     Comlink.proxy(handleInput),
     Comlink.proxy(handleMain),
-);
-
+  );
+  curExecutionState = "idle"
 }
 
 async function abortPyodide() {
@@ -107,13 +132,14 @@ function updateIcon() {
   readySymbol.style.display = 'none';
 
   // Muss noch gefixt werden
-  if (taskClient.running === 'loading') {
-    loadingSymbol.style.display = 'block';
-  } else if (taskClient.running === 'await input') {
+  if (curExecutionState === 'awaitingInput' || curExecutionState === 'awaitingUpload') {
     awaitSymbol.style.display = 'block';
+  } else if (taskClient.running === 'running' || curExecutionState == 'init') {
+    loadingSymbol.style.display = 'block';
   } else {
     readySymbol.style.display = 'block';
   }
+  console.log("state = " + curExecutionState);
 }
 
 setInterval(updateIcon, 500);
@@ -125,22 +151,12 @@ function Output(message: string, line_no: number) {
 }
 
 async function gotUpload(upload: File) {
-  if (waitForUpload) {
-    const arrayBuffer = await upload.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
-    taskClient.writeMessage(uint8Array)
-  } else {
-    Output('Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.', 0);
-  }
+  computeUpload(upload)
 }
 
 // Function called when the user inputs something
-async function gotInput(input: String) {
-  if (waitForInput) {
-    taskClient.writeMessage(input)
-  } else {
-    Output('Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.', 0);
-  }
+async function gotInput(input: string) {
+  computeInput(input)
 }
 
 // Create ChatManager instance
@@ -163,7 +179,7 @@ const editorElement = document.getElementById('monacoEditor');
 
 if (editorElement) {
   editor = monaco.editor.create(editorElement, {
-    value: "print('Hello, Monaco!');",
+    value: "print('Hello, Monaco!')",
     language: "python",
     theme: "vs-dark",
   });

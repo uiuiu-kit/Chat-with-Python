@@ -59,6 +59,37 @@ export class ChatManager {
         // Hauptcontainer in den Chat einfügen
         this.chatContainer?.appendChild(messageContainer);
     }
+    // Methode für Chat-Error-Ausgabe
+    chatError(message: string, line_no: number): void {
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-start', 'align-items-center');
+
+        const textContainer = document.createElement('div');
+        textContainer.classList.add('d-flex', 'align-items-center'); // Zeileninhalt in einer Linie
+
+        // Zeilennummer hinzufügen
+        const lineNumberElement = document.createElement('span');
+        lineNumberElement.classList.add('line-number', 'me-2'); // Abstand zur Nachricht
+        lineNumberElement.style.fontSize = '0.75rem';
+        lineNumberElement.style.color = '#6c757d'; // Grauer Farbton
+        lineNumberElement.textContent = `#${line_no}`;
+
+        // Nachricht hinzufügen
+        const messageElement = document.createElement('p');
+        messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
+        messageElement.textContent = "ERROR: " + message;
+
+        // Elemente in den Textcontainer einfügen
+        textContainer.appendChild(lineNumberElement);
+        textContainer.appendChild(messageElement);
+
+        // Textcontainer in den Hauptcontainer einfügen
+        messageContainer.appendChild(textContainer);
+
+        // Hauptcontainer in den Chat einfügen
+        this.chatContainer?.appendChild(messageContainer);
+    }
+    
 
     // Methode für Chat-Eingabe
     chatInput(message: string | File): void {
