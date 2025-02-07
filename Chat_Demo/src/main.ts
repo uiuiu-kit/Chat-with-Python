@@ -7,6 +7,8 @@ import * as monaco from 'monaco-editor';
 
 import {ChatManager} from './chat/chatScript';
 
+setInterval(updateIcon, 500);
+
 // ---------------- Webworker Functionality -------------------------------
 
 // Setup the channel to communicat between the main thread and the worker thread
@@ -132,17 +134,14 @@ function updateIcon() {
   readySymbol.style.display = 'none';
 
   // Muss noch gefixt werden
-  if (curExecutionState === 'awaitingInput' || curExecutionState === 'awaitingUpload') {
+  if (curExecutionState == 'awaitingInput' || curExecutionState == 'awaitingUpload') {
     awaitSymbol.style.display = 'block';
-  } else if (taskClient.running === 'running' || curExecutionState == 'init') {
+  } else if (curExecutionState == 'running' || curExecutionState == 'init') {
     loadingSymbol.style.display = 'block';
   } else {
     readySymbol.style.display = 'block';
   }
-  console.log("state = " + curExecutionState);
 }
-
-setInterval(updateIcon, 500);
 
 // --------------- Chat Functionality ----------------------
 

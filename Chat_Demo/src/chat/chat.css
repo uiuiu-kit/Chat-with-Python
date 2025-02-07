@@ -20,23 +20,6 @@
     max-height: 80vh;
 }
 
-/* New styles for rotating arrows symbol */
-.loading-symbol {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.loading-symbol::before {
-    content: '\21BB'; /* Unicode für einen sich drehenden Pfeil */
-    font-size: 40px;
-    color: #4caf50;
-    animation: spin 1s linear infinite;
-}
-
 @keyframes spin {
     from {
         transform: rotate(0deg);
@@ -46,26 +29,9 @@
     }
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.ready-symbol {
+#loading-symbol {
     width: 40px;
-    height: 40px;
-    background-color: #4caf50;
-    border-radius: 50%;
-    position: relative;
-}
-
-.ready-symbol::after {
-    content: '';
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 20px;
-    height: 20px;
-    background-color: white;
-    border-radius: 50%;
+    height: 100%;
+    display: none;
+    animation: spin 1.5s linear infinite;
 }
