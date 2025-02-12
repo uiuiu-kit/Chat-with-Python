@@ -19,18 +19,21 @@ let taskClient: any;
 type executionState = "init" | "idle" | "running" | "awaitingInput" | "awaitingUpload";
 
 let curExecutionState: executionState = "init";
+async function initWorker(){
+  // Setup The PyodideClient with my own worker
+  pyodideWorker = new Worker(new URL("./pyodide-worker.ts", import.meta.url), {
+    type: "module",
+  });
+  taskClient = new PyodideClient(() => pyodideWorker, channel);
 
-// Setup The PyodideClient with my own worker
-pyodideWorker = new Worker(new URL("./pyodide-worker.ts", import.meta.url), {
-  type: "module",
-});
-taskClient = new PyodideClient(() => pyodideWorker, channel);
+  await taskClient.call(
+    taskClient.workerProxy.initPyodideRunner,
+  );
+  curExecutionState = "idle";
+}
 
-await taskClient.call(
-  taskClient.workerProxy.initPyodideRunner,
-);
+initWorker()
 
-curExecutionState = "idle";
 
 async function updateOutput(outputArr: Array<Object>) {
   for (const part of outputArr) {
@@ -94,9 +97,12 @@ async function computeUpload(upload: File) {
 }
 
 async function runCode(code: string) {
+  if(curExecutionState != "idle") {
+    abortPyodide()
+  }
+  chatManager.newExecution()
   curExecutionState = "running"
     // pass code to webworker and run it
-  const resultPromise = 
   await taskClient.call(
     taskClient.workerProxy.runCode,
     code,
@@ -109,6 +115,7 @@ async function runCode(code: string) {
 
 async function abortPyodide() {
   await taskClient.interrupt();
+  await initWorker()
 }
 
 // ------------------ Button Management -----------------------------------
