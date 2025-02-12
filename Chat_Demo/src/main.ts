@@ -35,15 +35,28 @@ curExecutionState = "idle";
 async function updateOutput(outputArr: Array<Object>) {
   for (const part of outputArr) {
     const type = part["type"]
-    const text = part["text"]
+    const parsed = parseLogMessage(part["text"])
     if (["stderr", "traceback", "syntax_error"].includes(type)) {
-      console.error(text);
-      chatManager.chatError(text, 0)
+      console.error(parsed.text);
+      chatManager.chatError(parsed.text, parsed.line_no)
     } else {
-      console.log(text);
-      chatManager.chatOutput(text, 0)
+      console.log(parsed.text);
+      chatManager.chatOutput(parsed.text, parsed.line_no)
     }
   }
+}
+
+function parseLogMessage(logMessage: string): { code_name: string; line_no: number; text: string } {
+  const trimedMessage = logMessage.trim()
+  const regex = /^\[(.+?):(\d+)\]\s+(.+)$/;
+  const match = trimedMessage.match(regex);
+  if (match) {
+      const code_name = match[1]; // First capturing group
+      const line_no = parseInt(match[2], 10); // Second capturing group, converted to number
+      const text = match[3]; // Third capturing group
+      return { code_name, line_no, text };
+  }
+  return {code_name: "Error", line_no: 42, text: logMessage};
 }
 
 async function handleInput(question: string, type: string = "string") {
