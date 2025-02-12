@@ -10,17 +10,17 @@
 </head>
 <body>
     <section>
-        <div class="container py-5">
+        <div class="container-fluid py-3">
             <div class="row">
               <!-- Linke Spalte: Großes Texteingabefeld -->
-              <div class="col-md-5 col-lg-6">
+              <div class="col-md-8 col-lg-7">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">Python-Code-Eingabe</h5>
                     </div>
                     <div class="card-body">
                         <div class="card-footer p-3">
-                          <div id="monacoEditor" style="height: 400px; width: 100%;"></div>
+                          <div id="monacoEditor" style="height: calc(100vh - 200px); width: 100%;"></div>
                         </div>
                         <!-- Verstecktes Datei-Upload-Input -->
                         <input type="file" id="uploadCodeButton" accept=".py" style="display: none;">
@@ -33,12 +33,12 @@
                 </div>
               </div>
                 <!-- Rechte Spalte: Chat -->
-                <div class="col-md-7 col-lg-6">
+                <div class="col-md-4 col-lg-5">
                   <div class="card" id="chatWindow">
                       <div class="card-header d-flex justify-content-between align-items-center p-3">
                           <h5 class="mb-0">Chat</h5>
                       </div>
-                      <div class="card-body" data-mdb-perfect-scrollbar-init style="position: relative; height: 400px" id="chat">
+                      <div class="card-body" data-mdb-perfect-scrollbar-init style="position: relative; height: calc(100vh - 175px)" id="chat">
                           <div id="chat-container"></div>
                       </div>
                       <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
