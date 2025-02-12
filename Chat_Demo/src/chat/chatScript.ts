@@ -58,6 +58,7 @@ export class ChatManager {
 
         // Hauptcontainer in den Chat einfügen
         this.chatContainer?.appendChild(messageContainer);
+        this.scrollToBottom()
     }
     // Methode für Chat-Error-Ausgabe
     chatError(message: string, line_no: number): void {
@@ -88,6 +89,7 @@ export class ChatManager {
 
         // Hauptcontainer in den Chat einfügen
         this.chatContainer?.appendChild(messageContainer);
+        this.scrollToBottom()
     }
     
 
@@ -118,6 +120,16 @@ export class ChatManager {
         messageContainer.appendChild(textContainer);
     
         this.chatContainer?.appendChild(messageContainer);
+        this.scrollToBottom()
+    }
+
+    scrollToBottom() {
+        if(this.chatContainer){
+            const lastMessage = this.chatContainer.lastElementChild;
+            if (lastMessage) {
+                lastMessage.scrollIntoView({ behavior: "smooth" });
+            }
+        }
     }
 
     newExecution(): void {
