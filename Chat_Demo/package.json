@@ -1,6 +1,7 @@
 {
   "name": "chat_demp",
   "version": "1.0.0",
+  "type": "module",
   "main": "main.js",
   "scripts": {
     "dev": "vite",
