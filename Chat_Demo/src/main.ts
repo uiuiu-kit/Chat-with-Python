@@ -42,7 +42,10 @@ async function updateOutput(outputArr: Array<Object>) {
     if (["stderr", "traceback", "syntax_error"].includes(type)) {
       console.error(parsed.text);
       chatManager.chatError(parsed.text, parsed.line_no)
-    } else {
+    } else if(type == "input"){
+      console.log(parsed.text)
+    }
+      else {
       console.log(parsed.text);
       chatManager.chatOutput(parsed.text, parsed.line_no)
     }
@@ -51,7 +54,7 @@ async function updateOutput(outputArr: Array<Object>) {
 
 function parseLogMessage(logMessage: string): { code_name: string; line_no: number; text: string } {
   const trimedMessage = logMessage.trim()
-  const regex = /^\[(.+?):(\d+)\]\s+(.+)$/;
+  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764\s+(.+)$/;
   const match = trimedMessage.match(regex);
   if (match) {
       const code_name = match[1]; // First capturing group
@@ -89,7 +92,7 @@ async function computeUpload(upload: File) {
   if (curExecutionState == "awaitingUpload") {
     const arrayBuffer = await upload.arrayBuffer();
     const uint8Array = new Uint8Array(arrayBuffer);
-    taskClient.writeMessage(uint8Array)
+    taskClient.writeMessage(uint8Array) // Base 64 ausprobieren
     curExecutionState = "running"
   } else {
     Output('Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.', 0);
@@ -198,7 +201,7 @@ const editorElement = document.getElementById('monacoEditor');
 
 if (editorElement) {
   editor = monaco.editor.create(editorElement, {
-    value: "print('Hello, Monaco!')",
+    value: "input('Hello, Monaco!')",
     language: "python",
     theme: "vs-dark",
   });
