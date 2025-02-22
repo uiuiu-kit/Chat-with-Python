@@ -41,7 +41,9 @@ async function updateOutput(outputArr: Array<Object>) {
     const parsed = parseLogMessage(part["text"])
     if (["stderr", "traceback", "syntax_error"].includes(type)) {
       console.error(parsed.text);
-      chatManager.chatError(parsed.text, parsed.line_no)
+      if(curExecutionState != "init") {
+        chatManager.chatError("We failed: " + parsed.text, parsed.line_no)
+      }
     } else if(type == "input"){
       console.log(parsed.text)
     }
@@ -101,7 +103,7 @@ async function computeUpload(upload: File) {
 
 async function runCode(code: string) {
   if(curExecutionState != "idle") {
-    abortPyodide()
+    await abortPyodide()
   }
   chatManager.newExecution()
   curExecutionState = "running"
@@ -117,6 +119,7 @@ async function runCode(code: string) {
 }
 
 async function abortPyodide() {
+  curExecutionState = "init"
   await taskClient.interrupt();
   await initWorker()
 }
