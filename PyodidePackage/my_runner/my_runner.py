@@ -1,4 +1,4 @@
-from runner import PyodideRunner
+from python_runner import PyodideRunner
 
 class MyRunner(PyodideRunner):
     def __init__(self, *, callback=None, source_code="", filename="main.py"):

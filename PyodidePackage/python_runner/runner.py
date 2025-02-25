@@ -12,7 +12,7 @@ from contextlib import contextmanager
 from types import CodeType, ModuleType, TracebackType
 from typing import Callable, Any, Dict, Optional, Union
 
-from output import OutputBuffer
+from .output import OutputBuffer
 
 log = logging.getLogger(__name__)
 
