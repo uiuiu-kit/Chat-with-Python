@@ -12,7 +12,7 @@ setInterval(updateIcon, 500);
 // ---------------- Webworker Functionality -------------------------------
 
 // Setup the channel to communicat between the main thread and the worker thread
-let channel = makeChannel();
+let channel = makeChannel({ atomics: { bufferSize: 10 * 1024 * 1024 } }); // 10 MB
 let pyodideWorker: Worker;
 let taskClient: any;
 
@@ -61,17 +61,29 @@ function parseLogMessage(logMessage: string): { code_name: string; line_no: numb
   if (match) {
       const code_name = match[1]; // First capturing group
       const line_no = parseInt(match[2], 10); // Second capturing group, converted to number
-      const text = match[3]; // Third capturing group
+      const text = removeTagPrefix(match[3]); // Third capturing group
       return { code_name, line_no, text };
   }
   return {code_name: "Error", line_no: 42, text: logMessage};
 }
 
-async function handleInput(question: string, type: string = "string") {
-  if (type = "string") {
-    curExecutionState = "awaitingInput"
-  } else {
+function removeTagPrefix(s) {
+  const trimmedS = s.trim()
+  const prefix_regex = /^\u3333img\u3333(.+)$/;
+  const match = trimmedS.match(prefix_regex);
+  if (match) {
+    return match[1];
+  } 
+  return s
+}
+
+async function handleInput(question: string) {
+  const trimedMessage = question.trim()
+  const prefix = '\u3333img\u3333'; 
+  if (trimedMessage.startsWith(prefix)) {
     curExecutionState = "awaitingUpload"
+  } else {
+    curExecutionState = "awaitingInput"
   }
 }
 
@@ -92,9 +104,12 @@ async function computeInput(input: string) {
 
 async function computeUpload(upload: File) {
   if (curExecutionState == "awaitingUpload") {
-    const arrayBuffer = await upload.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
-    taskClient.writeMessage(uint8Array) // Base 64 ausprobieren
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64Image = (reader.result as string).split(',')[1];  // Entfernt "data:image/png;base64,"
+      taskClient.writeMessage(base64Image);
+    };
+    reader.readAsDataURL(upload)
     curExecutionState = "running"
   } else {
     Output('Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.', 0);

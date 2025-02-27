@@ -35,7 +35,7 @@ const runCode = pyodideExpose(async function runCode(
   extras: any,
   code: string,
   updateOutput: (text: Array<Object>) => void,
-  handleInput: (prompt: string, type?: string) => Promise<void>,
+  handleInput: (prompt: string) => Promise<void>,
   handleMain: (type: string, data: unknown) => Promise<void>,
 ) {
   const callback = makeRunnerCallback(extras, {
