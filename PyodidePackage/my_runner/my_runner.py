@@ -25,9 +25,12 @@ class MyRunner(PyodideRunner):
 
         def my_print(*args, **kwargs):
             code_name, line_no = get_caller_info()
-            # flush = true wenn kwargs == empty weiß noch nichts damit anzufangen
-            #if (output == error):
-            #    ouput.flush
+            if "file" in kwargs:
+                raise TypeError(f"kwargs file is not allowed")
+            if any(part["type"] == "error" for part in self.output_buffer.parts):
+                self.output_buffer.flush()
+            if not ("flush" in kwargs and kwargs["flush"] == False or "end" in kwargs):
+                kwargs = {"flush": True, **kwargs}
             if not self.output_buffer.parts:
                 prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764"
                 args = (prefix,) + args
