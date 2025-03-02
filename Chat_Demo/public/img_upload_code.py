@@ -12,8 +12,3 @@ def input_img(promt=""):
     image_data = base64.b64decode(base64Image)
     # Bild aus Bytes erstellen
     return Image.open(io.BytesIO(image_data))
-
-
-test_img = input_img("gib ein Bild")
-# Bildinformationen ausgeben
-print(test_img.size)  # (Breite, Höhe)

@@ -24,6 +24,7 @@ const initPyodideRunner = pyodideExpose(async function initPyodideRunner(
   extras: any,
 ) {
   const start = Date.now();
+  
   await reloader.withPyodide(async (pyodide: PyodideInterface) => {
     runner = pyodide.pyimport("my_runner");
   });
