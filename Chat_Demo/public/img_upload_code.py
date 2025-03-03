@@ -1,7 +1,6 @@
 import base64
 import io
 from PIL import Image
-import numpy as np
 
 img_prefix = "\u3333img\u3333"
 

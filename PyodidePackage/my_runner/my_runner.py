@@ -1,4 +1,7 @@
 from python_runner import PyodideRunner
+from PIL import Image
+import base64
+import io
 
 class MyRunner(PyodideRunner):
     def __init__(self, *, callback=None, source_code="", filename="main.py"):
@@ -37,12 +40,16 @@ class MyRunner(PyodideRunner):
             original_print(*args, **kwargs) 
             
         def my_input(prompt="", input_type="string"):
+            self.output_buffer.flush()
             code_name, line_no = get_caller_info()
-            prefix = ""
-            if not self.output_buffer.parts:
-                prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764 \u3333{input_type}\u3333"
-            self.output("input_prompt", prefix + " " + prompt) 
-            return self.readline(prompt=prompt)[:-1]
+            prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764 \u3333{input_type}\u3333"
+            self.output("input_prompt", prefix + " " + prompt)
+            if input_type == "img":
+                base64Image = self.readline(prompt=prompt)[:-1]
+                image_data = base64.b64decode(base64Image)
+                return Image.open(io.BytesIO(image_data))
+            else:
+                return self.readline(prompt=prompt)[:-1]
                      
         builtins.print = my_print
         return my_input

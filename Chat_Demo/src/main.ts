@@ -132,14 +132,12 @@ async function runCode(code: string) {
   if(curExecutionState != "idle") {
     await abortPyodide()
   }
-  const prerunCode = await (await fetch("/img_upload_code.py")).text();
-  const code_with_prerun = prerunCode + "\n" + code;
   chatManager.newExecution();
   curExecutionState = "running";
     // pass code to webworker and run it
   await taskClient.call(
     taskClient.workerProxy.runCode,
-    code_with_prerun,
+    code,
     Comlink.proxy(updateOutput),
     Comlink.proxy(handleInput),
     Comlink.proxy(handleMain),
