@@ -38,52 +38,64 @@ initWorker()
 async function updateOutput(outputArr: Array<Object>) {
   for (const part of outputArr) {
     const type = part["type"]
-    const parsed = parseLogMessage(part["text"])
     if (["stderr", "traceback", "syntax_error"].includes(type)) {
+      const parsed = parseOuputMessage(part["text"])
       console.error(parsed.text);
       if(curExecutionState != "init") {
         chatManager.chatError("We failed: " + parsed.text, parsed.line_no)
       }
-    } else if(type == "input"){
-      console.log(parsed.text)
+    } else if(type == "input_prompt"){
+      const parsed = parseInputMessage(part["text"])
+      console.log(parsed)
+      chatManager.chatOutput(parsed.text, parsed.line_no)
+    } else if(type == "input") {
+      console.log(part["text"])
     }
       else {
-      console.log(parsed.text);
+      const parsed = parseOuputMessage(part["text"])
+      console.log(parsed);
       chatManager.chatOutput(parsed.text, parsed.line_no)
     }
   }
 }
 
-function parseLogMessage(logMessage: string): { code_name: string; line_no: number; text: string } {
+function parseOuputMessage(logMessage: string): { code_name: string; line_no: number; text: string } {
   const trimedMessage = logMessage.trim()
   const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764\s+(.+)$/;
   const match = trimedMessage.match(regex);
   if (match) {
       const code_name = match[1]; // First capturing group
       const line_no = parseInt(match[2], 10); // Second capturing group, converted to number
-      const text = removeTagPrefix(match[3]); // Third capturing group
+      const text = match[3]; // Third capturing group
       return { code_name, line_no, text };
   }
   return {code_name: "Error", line_no: 42, text: logMessage};
 }
 
-function removeTagPrefix(s) {
-  const trimmedS = s.trim()
-  const prefix_regex = /^\u3333img\u3333(.+)$/;
-  const match = trimmedS.match(prefix_regex);
+function parseInputMessage(logMessage: string): { code_name: string; line_no: number; input_type: string; text: string } {
+  const trimmedMessage = logMessage.trim();
+  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764\s+\u3333(.+?)\u3333\s+(.+)$/;
+  const match = trimmedMessage.match(regex);
+  
   if (match) {
-    return match[1];
-  } 
-  return s
+      const code_name = match[1]; // Erster Capturing-Group
+      const line_no = parseInt(match[2], 10); // Zweiter Capturing-Group, in Zahl umwandeln
+      const input_type = match[3]; // Dritter Capturing-Group
+      const text = match[4]; // Vierter Capturing-Group
+      
+      return { code_name, line_no, input_type, text };
+  }
+  
+  return { code_name: "Error", line_no: 42, input_type: "Unknown", text: logMessage };
 }
 
-async function handleInput(question: string) {
+async function handleInput(question: string, input_type: string) {
   const trimedMessage = question.trim()
-  const prefix = '\u3333img\u3333'; 
-  if (trimedMessage.startsWith(prefix)) {
-    curExecutionState = "awaitingUpload"
-  } else {
+  const prefix = '\u3333img\u3333';
+  if (input_type == "string") {
     curExecutionState = "awaitingInput"
+  } else {
+    curExecutionState = "awaitingUpload"
   }
 }
 
@@ -121,7 +133,7 @@ async function runCode(code: string) {
     await abortPyodide()
   }
   const prerunCode = await (await fetch("/img_upload_code.py")).text();
-  const code_with_prerun = code + "\n" +  prerunCode;
+  const code_with_prerun = prerunCode + "\n" + code;
   chatManager.newExecution();
   curExecutionState = "running";
     // pass code to webworker and run it

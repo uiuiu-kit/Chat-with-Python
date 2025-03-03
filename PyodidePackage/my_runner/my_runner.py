@@ -36,11 +36,11 @@ class MyRunner(PyodideRunner):
                 args = (prefix,) + args
             original_print(*args, **kwargs) 
             
-        def my_input(prompt=""):
+        def my_input(prompt="", input_type="string"):
             code_name, line_no = get_caller_info()
             prefix = ""
             if not self.output_buffer.parts:
-                prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764"
+                prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764 \u3333{input_type}\u3333"
             self.output("input_prompt", prefix + " " + prompt) 
             return self.readline(prompt=prompt)[:-1]
                      
