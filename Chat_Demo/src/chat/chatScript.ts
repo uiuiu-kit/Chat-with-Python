@@ -30,36 +30,43 @@ export class ChatManager {
     }
 
     // Methode für Chat-Ausgabe
-    chatOutput(message: string, line_no: number): void {
+    chatOutput(message: string | File, line_no: number): void {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-start', 'align-items-center');
-
+    
         const textContainer = document.createElement('div');
-        textContainer.classList.add('d-flex', 'align-items-center'); // Zeileninhalt in einer Linie
-
+        textContainer.classList.add('d-flex', 'align-items-center');
+    
         // Zeilennummer hinzufügen
         const lineNumberElement = document.createElement('span');
-        lineNumberElement.classList.add('line-number', 'me-2'); // Abstand zur Nachricht
+        lineNumberElement.classList.add('line-number', 'me-2');
         lineNumberElement.style.fontSize = '0.75rem';
-        lineNumberElement.style.color = '#6c757d'; // Grauer Farbton
+        lineNumberElement.style.color = '#6c757d';
         lineNumberElement.textContent = `#${line_no}`;
-
-        // Nachricht hinzufügen
-        const messageElement = document.createElement('p');
-        messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
-        messageElement.textContent = message;
-
-        // Elemente in den Textcontainer einfügen
+    
         textContainer.appendChild(lineNumberElement);
-        textContainer.appendChild(messageElement);
-
-        // Textcontainer in den Hauptcontainer einfügen
+    
+        if (typeof message === 'string') {
+            // Textnachricht
+            const messageElement = document.createElement('p');
+            messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
+            messageElement.textContent = message;
+            textContainer.appendChild(messageElement);
+        } else if (message instanceof File && message.type.startsWith('image/')) {
+            // Bildnachricht
+            const imageElement = document.createElement('img');
+            imageElement.src = URL.createObjectURL(message);
+            imageElement.alt = 'Empfangenes Bild';
+            imageElement.style.maxWidth = '200px';
+            imageElement.style.borderRadius = '8px';
+            textContainer.appendChild(imageElement);
+        }
+    
         messageContainer.appendChild(textContainer);
-
-        // Hauptcontainer in den Chat einfügen
         this.chatContainer?.appendChild(messageContainer);
-        this.scrollToBottom()
+        this.scrollToBottom();
     }
+    
     // Methode für Chat-Error-Ausgabe
     chatError(message: string, line_no: number): void {
         const messageContainer = document.createElement('div');

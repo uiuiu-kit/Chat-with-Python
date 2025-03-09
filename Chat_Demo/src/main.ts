@@ -42,21 +42,38 @@ async function updateOutput(outputArr: Array<Object>) {
       const parsed = parseOuputMessage(part["text"])
       console.error(parsed.text);
       if(curExecutionState != "init") {
-        chatManager.chatError("We failed: " + parsed.text, parsed.line_no)
+        chatManager.chatError("We failed: " + parsed.text, parsed.line_no);
       }
     } else if(type == "input_prompt"){
-      const parsed = parseInputMessage(part["text"])
-      console.log(parsed)
-      chatManager.chatOutput(parsed.text, parsed.line_no)
-    } else if(type == "input") {
-      console.log(part["text"])
-    }
-      else {
-      const parsed = parseOuputMessage(part["text"])
+      const parsed = parseInputMessage(part["text"]);
       console.log(parsed);
       chatManager.chatOutput(parsed.text, parsed.line_no)
+    } else if(type == "input") {
+      console.log(part["text"]);
+    } else if(type == "img_output") {
+      const parsed = parseOuputMessage(part["text"]);
+      console.log(parsed);
+      const base64String = parsed.text;
+      const img_file = base64ToFile(base64String, "image.png");
+      chatManager.chatOutput(img_file, parsed.line_no);
+    }
+      else {
+      const parsed = parseOuputMessage(part["text"]);
+      console.log(parsed);
+      chatManager.chatOutput(parsed.text, parsed.line_no);
     }
   }
+}
+
+function base64ToFile(base64: string, fileName: string): File {
+  const byteCharacters = atob(base64); // Base64-Daten dekodieren
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: "image/png" }); // Blob mit Typ PNG
+  return new File([blob], fileName, { type: "image/png" }); // In File umwandeln
 }
 
 function parseOuputMessage(logMessage: string): { code_name: string; line_no: number; text: string } {

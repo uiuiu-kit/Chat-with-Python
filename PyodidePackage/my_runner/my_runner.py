@@ -6,30 +6,55 @@ import io
 class MyRunner(PyodideRunner):
     def __init__(self, *, callback=None, source_code="", filename="main.py"):
         super().__init__(callback=callback, source_code=source_code, filename=filename)
-        self.input = self.overwrite_print_and_input()
+        self.overwrite_print_and_input()
+        runner = self
+        Image.Image.show = lambda img: self.my_show(img)
+        self.input = self.my_input
 
     def pre_run(self, *args, **kwargs):
         x = super().pre_run(*args, **kwargs)
         return x
     
-    def overwrite_print_and_input(self):
+    def get_caller_info(self):
+        import inspect
+        frame = inspect.currentframe()
+        try:
+            frame = frame.f_back.f_back
+            return frame.f_code.co_name, frame.f_lineno
+        except:
+            return None, -1
 
-        def get_caller_info():
-            import inspect
-            frame = inspect.currentframe()
-            try:
-                frame = frame.f_back.f_back
-                return frame.f_code.co_name, frame.f_lineno
-            except:
-                return None, -1
-        
+    def my_show(self, img):
+        code_name, line_no = self.get_caller_info()
+        prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764"
+        buffered = io.BytesIO()
+        img.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        self.output("img_output", f"{prefix} {img_str}")
+    
+
+    def my_input(self, prompt="", input_type="string"):
+        self.output_buffer.flush()
+        code_name, line_no = self.get_caller_info()
+        prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764 \u3333{input_type}\u3333"
+        self.output("input_prompt", prefix + " " + prompt)
+        if input_type == "img":
+            base64Image = self.readline(prompt=prompt)[:-1]
+            image_data = base64.b64decode(base64Image)
+            return Image.open(io.BytesIO(image_data))
+        else:
+            return self.readline(prompt=prompt)[:-1]
+
+    
+
+    def overwrite_print_and_input(self):
         import builtins
         original_print = builtins.print
 
         def my_print(*args, **kwargs):
-            code_name, line_no = get_caller_info()
-            if "file" in kwargs:
-                raise TypeError(f"kwargs file is not allowed")
+            code_name, line_no = self.get_caller_info()
+            #if "file" in kwargs:
+              #  raise TypeError(f"kwargs file is not allowed")
             if any(part["type"] == "error" for part in self.output_buffer.parts):
                 self.output_buffer.flush()
             if not ("flush" in kwargs and kwargs["flush"] == False or "end" in kwargs):
@@ -37,22 +62,9 @@ class MyRunner(PyodideRunner):
             if not self.output_buffer.parts:
                 prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764"
                 args = (prefix,) + args
-            original_print(*args, **kwargs) 
-            
-        def my_input(prompt="", input_type="string"):
-            self.output_buffer.flush()
-            code_name, line_no = get_caller_info()
-            prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764 \u3333{input_type}\u3333"
-            self.output("input_prompt", prefix + " " + prompt)
-            if input_type == "img":
-                base64Image = self.readline(prompt=prompt)[:-1]
-                image_data = base64.b64decode(base64Image)
-                return Image.open(io.BytesIO(image_data))
-            else:
-                return self.readline(prompt=prompt)[:-1]
+            original_print(*args, **kwargs)
                      
         builtins.print = my_print
-        return my_input
 
 
 
