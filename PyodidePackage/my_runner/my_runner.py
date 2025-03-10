@@ -15,17 +15,18 @@ class MyRunner(PyodideRunner):
         x = super().pre_run(*args, **kwargs)
         return x
     
-    def get_caller_info(self):
+    def get_caller_info(self, lvl):
         import inspect
         frame = inspect.currentframe()
         try:
-            frame = frame.f_back.f_back
+            for i in range(lvl):
+               frame = frame.f_back
             return frame.f_code.co_name, frame.f_lineno
         except:
             return None, -1
 
     def my_show(self, img):
-        code_name, line_no = self.get_caller_info()
+        code_name, line_no = self.get_caller_info(3)
         prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764"
         buffered = io.BytesIO()
         img.save(buffered, format="PNG")
@@ -35,7 +36,7 @@ class MyRunner(PyodideRunner):
 
     def my_input(self, prompt="", input_type="string"):
         self.output_buffer.flush()
-        code_name, line_no = self.get_caller_info()
+        code_name, line_no = self.get_caller_info(2)
         prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764 \u3333{input_type}\u3333"
         self.output("input_prompt", prefix + " " + prompt)
         if input_type == "img":
@@ -52,7 +53,7 @@ class MyRunner(PyodideRunner):
         original_print = builtins.print
 
         def my_print(*args, **kwargs):
-            code_name, line_no = self.get_caller_info()
+            code_name, line_no = self.get_caller_info(2)
             #if "file" in kwargs:
               #  raise TypeError(f"kwargs file is not allowed")
             if any(part["type"] == "error" for part in self.output_buffer.parts):
