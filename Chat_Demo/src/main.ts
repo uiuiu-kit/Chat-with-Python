@@ -52,7 +52,6 @@ async function updateOutput(outputArr: Array<Object>) {
       console.log(part["text"]);
     } else if(type == "img_output") {
       const parsed = parseOuputMessage(part["text"]);
-      console.log(parsed);
       const base64String = parsed.text;
       const img_file = base64ToFile(base64String, "image.png");
       chatManager.chatOutput(img_file, parsed.line_no);

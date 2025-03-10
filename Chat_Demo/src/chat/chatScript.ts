@@ -58,7 +58,7 @@ export class ChatManager {
             const imageElement = document.createElement('img');
             imageElement.src = URL.createObjectURL(message);
             imageElement.alt = 'Empfangenes Bild';
-            imageElement.style.maxWidth = '200px';
+            imageElement.style.maxWidth = '300px';
             imageElement.style.borderRadius = '8px';
             textContainer.appendChild(imageElement);
         }
@@ -86,7 +86,7 @@ export class ChatManager {
         // Nachricht hinzufügen
         const messageElement = document.createElement('p');
         messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
-        messageElement.innerHTML = "ERROR: " + `<pre>${message}</pre>`;
+        messageElement.innerHTML = "ERROR: " + `<pre>${message.slice(0,-2)}</pre>`;
 
         // Elemente in den Textcontainer einfügen
         textContainer.appendChild(lineNumberElement);
@@ -105,31 +105,84 @@ export class ChatManager {
     chatInput(message: string | File): void {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-4', 'pt-1');
-
+    
         const textContainer = document.createElement('div');
     
-        // Überprüfen, ob die Eingabe ein Bild oder Text ist
         if (typeof message === 'string') {
-            // Wenn Text, Nachricht als Text anzeigen
+            //  Text anzeigen
             const messageElement = document.createElement('p');
             messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'text-white', 'rounded-3', 'bg-primary');
             messageElement.textContent = message;
             textContainer.appendChild(messageElement);
-        } else if (message instanceof File && message.type === 'image/png') {
-            // Wenn Bild, Nachricht als Bild anzeigen
-            const imageElement = document.createElement('img');
-            imageElement.src = URL.createObjectURL(message); // Bildquelle (Base64 oder URL)
-            imageElement.alt = 'Gesendetes Bild';
-            imageElement.style.maxWidth = '200px'; // Maximale Breite für Bilder
-            imageElement.style.borderRadius = '8px'; // Abgerundete Ecken
-            textContainer.appendChild(imageElement);
+        } else if (message instanceof File) {
+            if (message.type.startsWith('image/')) {
+                //  Bild anzeigen
+                const imageElement = document.createElement('img');
+                imageElement.src = URL.createObjectURL(message);
+                imageElement.alt = 'Gesendetes Bild';
+                imageElement.style.maxWidth = '300px';
+                imageElement.style.borderRadius = '8px';
+                textContainer.appendChild(imageElement);
+            } else if (message.type === 'text/csv') {
+                //  CSV anzeigen
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const csvText = reader.result as string;
+                    const tableElement = this.createTableFromCSV(csvText);
+                    textContainer.appendChild(tableElement);
+                };
+                reader.readAsText(message);
+            }
         }
     
         messageContainer.appendChild(textContainer);
-    
         this.chatContainer?.appendChild(messageContainer);
-        this.scrollToBottom()
+        this.scrollToBottom();
     }
+    
+    createTableFromCSV(csvText: string): HTMLDivElement {
+        const tableContainer = document.createElement('div'); // Container für Tabelle & Metadaten
+        tableContainer.classList.add('p-2', 'bg-light', 'border', 'rounded'); // Bootstrap-Styling
+    
+        const table = document.createElement('table');
+        table.classList.add('table', 'table-bordered', 'table-sm');
+    
+        const rows = csvText.trim().split('\n').map(row => row.split(',')); // CSV in 2D-Array umwandeln
+        const totalRows = rows.length;
+        const totalCols = rows[0].length;
+    
+        // Anzeige der Anzahl der Zeilen & Spalten
+        const infoText = document.createElement('p');
+        infoText.textContent = `📊 ${totalRows} Zeilen, ${totalCols} Spalten`;
+        infoText.classList.add('mb-2', 'fw-bold');
+        tableContainer.appendChild(infoText);
+    
+        // Bestimmen, welche Zeilen angezeigt werden sollen
+        let visibleRows: string[][] = [];
+        if (totalRows > 20) {
+            visibleRows = [...rows.slice(0, 5), ["...".repeat(totalCols)], ...rows.slice(-5)];
+        } else {
+            visibleRows = rows;
+        }
+    
+        // Tabelle generieren
+        visibleRows.forEach((rowText, rowIndex) => {
+            const row = document.createElement('tr');
+    
+            rowText.forEach(cellText => {
+                const cell = document.createElement('td'); // Erste Zeile = Header
+                cell.textContent = cellText.trim();
+                row.appendChild(cell);
+            });
+    
+            table.appendChild(row);
+        });
+    
+        tableContainer.appendChild(table);
+        return tableContainer;
+    }
+    
+    
 
     scrollToBottom() {
         if(this.chatContainer){
