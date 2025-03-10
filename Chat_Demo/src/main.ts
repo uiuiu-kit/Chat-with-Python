@@ -78,7 +78,7 @@ function base64ToFile(base64: string, fileName: string): File {
 
 function parseOuputMessage(logMessage: string): { code_name: string; line_no: number; text: string } {
   const trimedMessage = logMessage.trim()
-  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764\s+(.+)$/;
+  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764\s+([\s\S]+)$/;
   const match = trimedMessage.match(regex);
   if (match) {
       const code_name = match[1]; // First capturing group
@@ -132,18 +132,40 @@ async function computeInput(input: string) {
 }
 
 async function computeUpload(upload: File) {
-  if (curExecutionState == "awaitingUpload") {
+  if (curExecutionState === "awaitingUpload") {
     const reader = new FileReader();
+
     reader.onload = async () => {
-      const base64Image = (reader.result as string).split(',')[1];  // Entfernt "data:image/png;base64,"
-      taskClient.writeMessage(base64Image);
+      if (upload.type.startsWith("image/")) {
+        // Bild wird als Base64 gelesen
+        const base64Image = (reader.result as string).split(",")[1]; // Entfernt "data:image/png;base64,"
+        taskClient.writeMessage(base64Image);
+      } else if (upload.type === "text/csv") {
+        // CSV wird als Text gelesen und in Base64 umgewandelt
+        const textData = reader.result as string;
+        const base64CSV = btoa(textData); // Text in Base64 umwandeln
+        taskClient.writeMessage(base64CSV);
+      } else {
+        Output("Dateityp nicht unterstützt.", 0);
+        return;
+      }
+
+      curExecutionState = "running";
     };
-    reader.readAsDataURL(upload)
-    curExecutionState = "running"
+
+    // Richtige Lesemethode je nach Dateityp wählen
+    if (upload.type.startsWith("image/")) {
+      reader.readAsDataURL(upload);
+    } else if (upload.type === "text/csv") {
+      reader.readAsText(upload);
+    } else {
+      Output("Dateityp nicht unterstützt.", 0);
+    }
   } else {
-    Output('Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.', 0);
+    Output("Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.", 0);
   }
 }
+
 
 async function runCode(code: string) {
   if(curExecutionState != "idle") {
@@ -237,7 +259,6 @@ const chatManager = new ChatManager({
   onInput: gotInput,
   onUpload: gotUpload,
 });
-
 // ------------- Editor Functionality -------------------------
 
 // monacoEditor

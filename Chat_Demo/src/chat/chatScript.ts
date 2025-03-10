@@ -51,6 +51,7 @@ export class ChatManager {
             const messageElement = document.createElement('p');
             messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
             messageElement.textContent = message;
+            messageElement.innerHTML = `<pre>${message}</pre>`;
             textContainer.appendChild(messageElement);
         } else if (message instanceof File && message.type.startsWith('image/')) {
             // Bildnachricht
@@ -85,7 +86,7 @@ export class ChatManager {
         // Nachricht hinzufügen
         const messageElement = document.createElement('p');
         messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
-        messageElement.textContent = "ERROR: " + message;
+        messageElement.innerHTML = "ERROR: " + `<pre>${message}</pre>`;
 
         // Elemente in den Textcontainer einfügen
         textContainer.appendChild(lineNumberElement);

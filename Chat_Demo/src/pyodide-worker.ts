@@ -26,7 +26,7 @@ const initPyodideRunner = pyodideExpose(async function initPyodideRunner(
   const start = Date.now();
   
   await reloader.withPyodide(async (pyodide: PyodideInterface) => {
-    await pyodide.loadPackage("pillow")
+    await pyodide.loadPackage(["pillow", "pandas"])
     runner = pyodide.pyimport("my_runner");
   });
   const end = Date.now();
