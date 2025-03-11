@@ -48,6 +48,11 @@ async function updateOutput(outputArr: Array<Object>) {
       const parsed = parseInputMessage(part["text"]);
       console.log(parsed);
       chatManager.chatOutput(parsed.text, parsed.line_no)
+      if (parsed.input_type == "string") {
+        curExecutionState = "awaitingInput"
+      } else {
+        curExecutionState = "awaitingUpload"
+      }
     } else if(type == "input") {
       console.log(part["text"]);
     } else if(type == "img_output") {
@@ -106,13 +111,8 @@ function parseInputMessage(logMessage: string): { code_name: string; line_no: nu
 }
 
 async function handleInput(question: string, input_type: string) {
-  const trimedMessage = question.trim()
-  const prefix = '\u3333img\u3333';
-  if (input_type == "string") {
-    curExecutionState = "awaitingInput"
-  } else {
-    curExecutionState = "awaitingUpload"
-  }
+  // DO-NOTHING
+  // ALL FUNCIONALITY IS IN UPDATE OUTPUT
 }
 
 async function handleMain() {
@@ -126,7 +126,7 @@ async function computeInput(input: string) {
     taskClient.writeMessage(input)
     curExecutionState = "running"
   } else {
-    Output('Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.', 0);
+    Output('Input nicht möglich. Bitte warten Sie, bis der Input aktiv ist.', 0);
   }
 }
 

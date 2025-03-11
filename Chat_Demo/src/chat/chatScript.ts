@@ -50,8 +50,7 @@ export class ChatManager {
             // Textnachricht
             const messageElement = document.createElement('p');
             messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
-            messageElement.textContent = message;
-            messageElement.innerHTML = `<pre>${message}</pre>`;
+            messageElement.innerHTML = `<pre style="display: inline;">${message}</pre>`;
             textContainer.appendChild(messageElement);
         } else if (message instanceof File && message.type.startsWith('image/')) {
             // Bildnachricht
@@ -72,6 +71,7 @@ export class ChatManager {
     chatError(message: string, line_no: number): void {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-start', 'align-items-center');
+        
 
         const textContainer = document.createElement('div');
         textContainer.classList.add('d-flex', 'align-items-center'); // Zeileninhalt in einer Linie
@@ -86,7 +86,7 @@ export class ChatManager {
         // Nachricht hinzufügen
         const messageElement = document.createElement('p');
         messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
-        messageElement.innerHTML = "ERROR: " + `<pre>${message.slice(0,-2)}</pre>`;
+        messageElement.innerHTML = "ERROR: " + `<pre style="display: inline;">${message}</pre>`;
 
         // Elemente in den Textcontainer einfügen
         textContainer.appendChild(lineNumberElement);
@@ -153,7 +153,7 @@ export class ChatManager {
     
         // Anzeige der Anzahl der Zeilen & Spalten
         const infoText = document.createElement('p');
-        infoText.textContent = `📊 ${totalRows} Zeilen, ${totalCols} Spalten`;
+        infoText.textContent = `${totalRows} Zeilen, ${totalCols} Spalten`;
         infoText.classList.add('mb-2', 'fw-bold');
         tableContainer.appendChild(infoText);
     
