@@ -3,8 +3,8 @@ interface ChatManagerOptions {
     inputFieldId: string;
     sendButtonId: string;
     fileInputButtonId: string;
-    onInput?: (input: string) => void;
-    onUpload?: (file: File) => void;
+    onInput?: (input: string) => boolean;
+    onUpload?: (file: File) => boolean;
 }
 
 export class ChatManager {
@@ -12,8 +12,8 @@ export class ChatManager {
     private inputField: HTMLInputElement | null;
     private sendButton: HTMLButtonElement | null;
     private fileInputButton: HTMLInputElement | null;
-    private onInput: ((input: string) => void) | undefined;
-    private onUpload: ((file: File) => void) | undefined;
+    private onInput: ((input: string) => boolean) | undefined;
+    private onUpload: ((file: File) => boolean) | undefined;
     private executionCounter: number;
     
     constructor({ chatContainerId, inputFieldId, sendButtonId, fileInputButtonId, onInput, onUpload }: ChatManagerOptions) {
@@ -102,7 +102,7 @@ export class ChatManager {
     
 
     // Methode für Chat-Eingabe
-    chatInput(message: string | File): void {
+    chatInput(message: string | File, expected: boolean): void {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-4', 'pt-1');
     
@@ -111,7 +111,12 @@ export class ChatManager {
         if (typeof message === 'string') {
             //  Text anzeigen
             const messageElement = document.createElement('p');
-            messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'text-white', 'rounded-3', 'bg-primary');
+            messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'rounded-3');
+            if(expected) {
+                messageElement.classList.add('bg-primary', 'text-white');
+            } else {
+                messageElement.classList.add('bg-body-tertiary');
+            }
             messageElement.textContent = message;
             textContainer.appendChild(messageElement);
         } else if (message instanceof File) {
@@ -134,9 +139,19 @@ export class ChatManager {
                 reader.readAsText(message);
             }
         }
-    
         messageContainer.appendChild(textContainer);
         this.chatContainer?.appendChild(messageContainer);
+        // Vielleicht noch austauschen
+        if(! expected) {
+
+            const notificationContainer = document.createElement('div');
+            notificationContainer.classList.add('d-flex', 'flex-row', 'justify-content-end');
+            const notExpectedNotification = document.createElement('p');
+            notExpectedNotification.classList.add('small', 'p-2', 'me-3', 'mb-1', 'rounded-3','bg-body-tertiary');
+            notExpectedNotification.textContent = 'Message not computed';
+            notificationContainer.appendChild(notExpectedNotification);
+            this.chatContainer?.appendChild(notificationContainer);
+        }
         this.scrollToBottom();
     }
     
@@ -216,13 +231,12 @@ export class ChatManager {
     processInput(): void {
         const input = this.inputField?.value;
 
-        if (input && input.trim()) {
-            // Nutzer-Eingabe anzeigen
-            this.chatInput(input);
+        if (input && input.trim()) {            
 
             // Callback aufrufen, wenn definiert
             if (this.onInput) {
-                this.onInput(input);
+                const expected = this.onInput(input);
+                this.chatInput(input, expected)
             }
 
             // Eingabefeld leeren
@@ -234,13 +248,12 @@ export class ChatManager {
     processUpload(): void {
         if(this.fileInputButton?.files){
             const upload = this.fileInputButton.files[0];
-            if (upload) {
-                // Nutzer-Eingabe anzeigen
-                this.chatInput(upload);
+            if (upload) {                
     
                 // Callback aufrufen, wenn definiert
                 if (this.onUpload) {
-                    this.onUpload(upload);
+                    const expected = this.onUpload(upload);
+                    this.chatInput(upload, expected);
                 }
             }
             

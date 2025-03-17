@@ -240,13 +240,21 @@ function Output(message: string, line_no: number) {
   chatManager.chatOutput(message, line_no);
 }
 
-async function gotUpload(upload: File) {
-  computeUpload(upload)
+function gotUpload(upload: File) {
+  if(curExecutionState == "awaitingUpload") {
+    computeUpload(upload);
+    return true;
+  }
+  else return false;
 }
 
 // Function called when the user inputs something
-async function gotInput(input: string) {
-  computeInput(input)
+function gotInput(input: string): boolean {
+  if(curExecutionState == "awaitingInput"){
+    computeInput(input);
+    return true;
+  }
+  else return false;
 }
 
 // Create ChatManager instance
