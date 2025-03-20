@@ -42,7 +42,7 @@ async function updateOutput(outputArr: Array<Object>) {
       const parsed = parseOuputMessage(part["text"])
       console.error(parsed.text);
       if(curExecutionState != "init") {
-        chatManager.chatError("We failed: " + parsed.text, parsed.line_no);
+        chatManager.chatError(parsed.text, parsed.line_no);
       }
     } else if(type == "input_prompt"){
       const parsed = parseInputMessage(part["text"]);

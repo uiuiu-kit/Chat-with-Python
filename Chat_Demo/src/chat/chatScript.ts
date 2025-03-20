@@ -85,7 +85,7 @@ export class ChatManager {
 
         // Nachricht hinzufügen
         const messageElement = document.createElement('p');
-        messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
+        messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-danger');
         messageElement.innerHTML = "ERROR: " + `<pre style="display: inline;">${message}</pre>`;
 
         // Elemente in den Textcontainer einfügen
