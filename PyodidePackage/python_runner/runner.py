@@ -233,7 +233,6 @@ class FakeStdin:
 class PatchedStdinRunner(Runner):  # noqa
     def pre_run(self, *args, **kwargs):
         sys.stdin = FakeStdin(self.readline)
-        builtins.input = self.input
         return super().pre_run(*args, **kwargs)
 
     def reset(self):
@@ -258,10 +257,6 @@ class PatchedStdinRunner(Runner):  # noqa
         to_return = self.line[:n]
         self.line = self.line[n:]
         return to_return
-
-    def input(self, prompt="") -> str:
-        self.output("input_prompt", prompt)
-        return self.readline(prompt=prompt)[:-1]  # Remove trailing newline
 
 
 class PatchedSleepRunner(Runner):  # noqa

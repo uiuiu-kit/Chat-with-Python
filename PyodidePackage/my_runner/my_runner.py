@@ -7,10 +7,9 @@ import io
 class MyRunner(PyodideRunner):
     def __init__(self, *, callback=None, source_code="", filename="main.py"):
         super().__init__(callback=callback, source_code=source_code, filename=filename)
-        self.overwrite_print_and_input()
-        runner = self
+        self.overwrite_print()
         Image.Image.show = lambda img: self.my_show(img)
-        self.input = self.my_input
+        self.addChatFunctions()
 
     def pre_run(self, *args, **kwargs):
         x = super().pre_run(*args, **kwargs)
@@ -26,6 +25,11 @@ class MyRunner(PyodideRunner):
         except:
             return None, -1
 
+    def addChatFunctions(self):
+        __builtins__["input"] = lambda prompt = "": self.my_input(prompt, "string")
+        __builtins__["inputImg"] = lambda prompt = "": self.my_input(prompt, "img")
+        __builtins__["inputTable"] = lambda prompt = "": self.my_input(prompt, "table")
+
     def my_show(self, img):
         code_name, line_no = self.get_caller_info(3)
         prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764"
@@ -37,7 +41,7 @@ class MyRunner(PyodideRunner):
 
     def my_input(self, prompt="", input_type="string"):
         self.output_buffer.flush()
-        code_name, line_no = self.get_caller_info(2)
+        code_name, line_no = self.get_caller_info(3)
         prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764 \u3333{input_type}\u3333"
         self.output("input_prompt", prefix + " " + prompt)
         if input_type == "img":
@@ -53,7 +57,7 @@ class MyRunner(PyodideRunner):
 
     
 
-    def overwrite_print_and_input(self):
+    def overwrite_print(self):
         import builtins
         original_print = builtins.print
 
