@@ -115,7 +115,7 @@ export class ChatManager {
             if(expected) {
                 messageElement.classList.add('bg-primary', 'text-white');
             } else {
-                messageElement.classList.add('bg-body-tertiary');
+                messageElement.classList.add('bg-warning');
             }
             messageElement.textContent = message;
             textContainer.appendChild(messageElement);
@@ -147,7 +147,7 @@ export class ChatManager {
             const notificationContainer = document.createElement('div');
             notificationContainer.classList.add('d-flex', 'flex-row', 'justify-content-end');
             const notExpectedNotification = document.createElement('p');
-            notExpectedNotification.classList.add('small', 'p-2', 'me-3', 'mb-1', 'rounded-3','bg-body-tertiary');
+            notExpectedNotification.classList.add('small', 'p-2', 'me-3', 'mb-1', 'rounded-3','bg-warning');
             notExpectedNotification.textContent = 'Message not computed';
             notificationContainer.appendChild(notExpectedNotification);
             this.chatContainer?.appendChild(notificationContainer);
