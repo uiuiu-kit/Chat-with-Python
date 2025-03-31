@@ -3,16 +3,18 @@ from PIL import Image
 import pandas as pd
 import base64
 import io
+import matplotlib.pyplot
 
 class MyRunner(PyodideRunner):
     def __init__(self, *, callback=None, source_code="", filename="main.py"):
         super().__init__(callback=callback, source_code=source_code, filename=filename)
         self.overwrite_print()
-        Image.Image.show = lambda img: self.my_show(img)
         self.addChatFunctions()
 
     def pre_run(self, *args, **kwargs):
         x = super().pre_run(*args, **kwargs)
+        self.override_matplotlib()
+        Image.Image.show = lambda img: self.my_show(img)
         return x
     
     def get_caller_info(self, lvl):
@@ -37,6 +39,29 @@ class MyRunner(PyodideRunner):
         img.save(buffered, format="PNG")
         img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
         self.output("img_output", f"{prefix} {img_str}")
+    
+    def override_matplotlib(self):
+        """if matplotlib is imported, we have to patch the show function. the show function exports the plot as
+        png and stores it to a base64 encoded buffer. This Buffer is then sent to the front end and rendered there
+        """
+        try:
+            import matplotlib
+            matplotlib.use("Agg")
+            # workaround from https://github.com/pyodide/pyodide/issues/1518
+            def show():
+                code_name, line_no = self.get_caller_info(2)
+                prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764"
+                buffered = io.BytesIO()
+                matplotlib.pyplot.savefig(buffered, format="png")
+                buffered.seek(0)
+                # encode to a base64 str
+                img_str = base64.b64encode(buffered.read()).decode("utf-8")
+                matplotlib.pyplot.clf()
+                self.output("img_output", f"{prefix} {img_str}")
+            matplotlib.pyplot.show = show
+        except ModuleNotFoundError:
+            pass
+
     
 
     def my_input(self, prompt="", input_type="string"):
