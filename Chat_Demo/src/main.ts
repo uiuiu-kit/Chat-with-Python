@@ -180,7 +180,9 @@ async function runCode(code: string) {
     Comlink.proxy(handleInput),
     Comlink.proxy(handleMain),
   );
-  curExecutionState = "idle"
+  if (curExecutionState === "running") {
+    curExecutionState = "idle";
+  }
 }
 
 async function abortPyodide() {
@@ -224,7 +226,6 @@ function updateIcon() {
   awaitSymbol.style.display = 'none';
   readySymbol.style.display = 'none';
 
-  // Muss noch gefixt werden
   if (curExecutionState == 'awaitingInput' || curExecutionState == 'awaitingUpload') {
     awaitSymbol.style.display = 'block';
   } else if (curExecutionState == 'running' || curExecutionState == 'init') {
