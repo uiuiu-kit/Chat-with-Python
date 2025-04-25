@@ -80,7 +80,9 @@ class MyRunner(PyodideRunner):
         else:
             return self.readline(prompt=prompt)[:-1]
 
-    
+    def send_table(self, table):
+        tabel_csv = table.to_csv()
+        self.output("table_output", tabel_csv)
 
     def overwrite_print(self):
         import builtins
@@ -88,8 +90,9 @@ class MyRunner(PyodideRunner):
 
         def my_print(*args, **kwargs):
             code_name, line_no = self.get_caller_info(2)
-            #if "file" in kwargs:
-              #  raise TypeError(f"kwargs file is not allowed")
+            for arg in args:
+                if isinstance(arg, pd.DataFrame):
+                    self.send_table(arg)
             if any(part["type"] == "error" for part in self.output_buffer.parts):
                 self.output_buffer.flush()
             if not ("flush" in kwargs and kwargs["flush"] == False or "end" in kwargs):

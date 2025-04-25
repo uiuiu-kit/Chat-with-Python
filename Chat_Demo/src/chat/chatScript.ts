@@ -1,3 +1,8 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap';
+import { Tooltip } from 'bootstrap';
+
+
 interface ChatManagerOptions {
     chatContainerId: string;
     inputFieldId: string;
@@ -27,6 +32,7 @@ export class ChatManager {
         this.executionCounter = 1;
 
         this.initializeListeners();
+
     }
 
     // Methode für Chat-Ausgabe
@@ -52,6 +58,24 @@ export class ChatManager {
             messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
             messageElement.innerHTML = `<pre style="display: inline;">${message}</pre>`;
             textContainer.appendChild(messageElement);
+        } else if (message instanceof File && message.type.startsWith('text/csv')) {
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                const csvText = reader.result as string;
+                const tableElement = this.createTableFromCSV(csvText);
+                textContainer.appendChild(tableElement);
+                // Download-Link hinzufügen
+                const blob = new Blob([message], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const downloadLink = document.createElement('a');
+                downloadLink.href = url;
+                downloadLink.download = "table";
+                downloadLink.textContent = `Download Table`;
+                downloadLink.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'mt-2');
+                textContainer.appendChild(downloadLink);
+            };
+            reader.readAsText(message);
         } else if (message instanceof File && message.type.startsWith('image/')) {
             // Bildnachricht
             const imageElement = document.createElement('img');
@@ -85,7 +109,7 @@ export class ChatManager {
 
         // Nachricht hinzufügen
         const messageElement = document.createElement('p');
-        messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-danger');
+        messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-danger-light');
         messageElement.innerHTML = "ERROR: " + `<pre style="display: inline;">${message}</pre>`;
 
         // Elemente in den Textcontainer einfügen
@@ -111,12 +135,7 @@ export class ChatManager {
         if (typeof message === 'string') {
             //  Text anzeigen
             const messageElement = document.createElement('p');
-            messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'rounded-3');
-            if(expected) {
-                messageElement.classList.add('bg-primary', 'text-white');
-            } else {
-                messageElement.classList.add('bg-warning');
-            }
+            messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'rounded-3', 'bg-primary', 'text-white');
             messageElement.textContent = message;
             textContainer.appendChild(messageElement);
         } else if (message instanceof File) {
@@ -147,10 +166,13 @@ export class ChatManager {
             const notificationContainer = document.createElement('div');
             notificationContainer.classList.add('d-flex', 'flex-row', 'justify-content-end');
             const notExpectedNotification = document.createElement('p');
-            notExpectedNotification.classList.add('small', 'p-2', 'me-3', 'mb-1', 'rounded-3','bg-warning');
-            notExpectedNotification.textContent = 'Message not computed';
+            notExpectedNotification.classList.add('small', 'p-2', 'me-4', 'rounded-3','bg-warning', 'overlap-message');
+            notExpectedNotification.textContent = 'Message not deliverd';
             notificationContainer.appendChild(notExpectedNotification);
             this.chatContainer?.appendChild(notificationContainer);
+            notExpectedNotification.setAttribute('data-bs-toggle', 'tooltip');
+            notExpectedNotification.setAttribute('title', 'This message was sent before the Python program expected any input, so the input was not delivered and will have no effect on the execution of the Python code.');
+            const tooltipTrigger = new Tooltip(notExpectedNotification, { placement: 'bottom' });
         }
         this.scrollToBottom();
     }
@@ -249,7 +271,7 @@ export class ChatManager {
         if(this.fileInputButton?.files){
             const upload = this.fileInputButton.files[0];
             if (upload) {                
-    
+
                 // Callback aufrufen, wenn definiert
                 if (this.onUpload) {
                     const expected = this.onUpload(upload);

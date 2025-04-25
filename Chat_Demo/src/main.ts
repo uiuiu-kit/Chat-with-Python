@@ -15,6 +15,7 @@ setInterval(updateIcon, 500);
 let channel = makeChannel({ atomics: { bufferSize: 10 * 1024 * 1024 } }); // 10 MB
 let pyodideWorker: Worker;
 let taskClient: any;
+let csvFiles: { name: string; content: string }[] = [];
 
 type executionState = "init" | "idle" | "running" | "awaitingInput" | "awaitingUpload";
 
@@ -60,6 +61,8 @@ async function updateOutput(outputArr: Array<Object>) {
       const base64String = parsed.text;
       const img_file = base64ToFile(base64String, "image.png");
       chatManager.chatOutput(img_file, parsed.line_no);
+    } else if(type == "table_output") {
+      computeTableOutput(part["text"])
     }
       else {
       const parsed = parseOuputMessage(part["text"]);
@@ -67,6 +70,21 @@ async function updateOutput(outputArr: Array<Object>) {
       chatManager.chatOutput(parsed.text, parsed.line_no);
     }
   }
+}
+
+function computeTableOutput(csvText: string) {
+  console.log("Tabelle erhalten") 
+
+  // Convert CSV string to File object
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const fileName = `table-${timestamp}.csv`;
+  const file = new File([csvText], fileName, { type: 'text/csv' });
+
+  // Save file in csvFiles array
+  csvFiles.push({ name: fileName, content: csvText });
+
+  // Pass File object to chatManager for rendering and download link
+  chatManager.chatOutput(file, 12);
 }
 
 function base64ToFile(base64: string, fileName: string): File {

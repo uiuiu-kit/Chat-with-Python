@@ -7,6 +7,15 @@
     box-shadow: inset 0px 0px 0px 1px transparent;
 }
 
+.bg-danger-light {
+    background-color: #f8d7da; /* Helles Bootstrap-Rot */
+  }
+
+
+.overlap-message {
+    margin-top: -35px;
+}
+
 .divider:after,
 .divider:before {
     content: "";
@@ -35,3 +44,4 @@
     display: none;
     animation: spin 1.5s linear infinite;
 }
+
