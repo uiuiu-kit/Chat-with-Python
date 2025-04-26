@@ -81,8 +81,10 @@ class MyRunner(PyodideRunner):
             return self.readline(prompt=prompt)[:-1]
 
     def send_table(self, table):
-        tabel_csv = table.to_csv()
-        self.output("table_output", tabel_csv)
+        code_name, line_no = self.get_caller_info(3)
+        prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764"
+        tabel_csv = table.to_csv(header=False, index = False)
+        self.output("table_output", f"{prefix} {tabel_csv}")
 
     def overwrite_print(self):
         import builtins
@@ -93,6 +95,7 @@ class MyRunner(PyodideRunner):
             for arg in args:
                 if isinstance(arg, pd.DataFrame):
                     self.send_table(arg)
+                    return
             if any(part["type"] == "error" for part in self.output_buffer.parts):
                 self.output_buffer.flush()
             if not ("flush" in kwargs and kwargs["flush"] == False or "end" in kwargs):

@@ -64,16 +64,25 @@ export class ChatManager {
             reader.onload = () => {
                 const csvText = reader.result as string;
                 const tableElement = this.createTableFromCSV(csvText);
-                textContainer.appendChild(tableElement);
-                // Download-Link hinzufügen
+
+                // Wrapper-DIV erstellen
+                const wrapper = document.createElement('div');
+                wrapper.appendChild(tableElement);
+
+                // Download-Link erstellen
                 const blob = new Blob([message], { type: 'text/csv' });
                 const url = URL.createObjectURL(blob);
                 const downloadLink = document.createElement('a');
                 downloadLink.href = url;
-                downloadLink.download = "table";
+                downloadLink.download = "table.csv";  // evtl. Endung ergänzen
                 downloadLink.textContent = `Download Table`;
                 downloadLink.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'mt-2');
-                textContainer.appendChild(downloadLink);
+
+                // Download-Link zum Wrapper hinzufügen
+                wrapper.appendChild(downloadLink);
+
+                // Wrapper in den TextContainer einfügen
+                textContainer.appendChild(wrapper);
             };
             reader.readAsText(message);
         } else if (message instanceof File && message.type.startsWith('image/')) {

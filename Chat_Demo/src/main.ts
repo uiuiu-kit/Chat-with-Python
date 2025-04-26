@@ -62,7 +62,9 @@ async function updateOutput(outputArr: Array<Object>) {
       const img_file = base64ToFile(base64String, "image.png");
       chatManager.chatOutput(img_file, parsed.line_no);
     } else if(type == "table_output") {
-      computeTableOutput(part["text"])
+      const parsed = parseOuputMessage(part["text"]);
+      const csv_file = computeTableOutput(parsed.text);
+      chatManager.chatOutput(csv_file, parsed.line_no);
     }
       else {
       const parsed = parseOuputMessage(part["text"]);
@@ -84,7 +86,7 @@ function computeTableOutput(csvText: string) {
   csvFiles.push({ name: fileName, content: csvText });
 
   // Pass File object to chatManager for rendering and download link
-  chatManager.chatOutput(file, 12);
+  return file;
 }
 
 function base64ToFile(base64: string, fileName: string): File {
