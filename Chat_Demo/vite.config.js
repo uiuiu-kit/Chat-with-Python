@@ -7,6 +7,9 @@ export default defineConfig({
             external: ['pyodide-worker-runner', 'comlink', 'comsync'],
         },
     },
+    worker: {
+        format: 'es'
+    },
     server: {
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin',
