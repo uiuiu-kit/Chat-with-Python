@@ -39,4 +39,4 @@ Start the development server with:
 npm run dev
 ```
 
-This will start the Vite development server. Open your browser and go to the URL shown in the terminal (usually http://localhost:3000).
+This will start the Vite development server. Open your browser and go to the URL shown in the terminal.
