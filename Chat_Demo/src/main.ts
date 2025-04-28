@@ -12,7 +12,7 @@ setInterval(updateIcon, 500);
 // ---------------- Webworker Functionality -------------------------------
 
 // Setup the channel to communicat between the main thread and the worker thread
-let channel = makeChannel({ atomics: { bufferSize: 10 * 1024 * 1024 } }); // 10 MB
+let channel = makeChannel({ atomics: { bufferSize: 100 * 1024 * 1024 } });
 let pyodideWorker: Worker;
 let taskClient: any;
 let csvFiles: { name: string; content: string }[] = [];
