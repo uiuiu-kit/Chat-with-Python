@@ -17,7 +17,7 @@ let pyodideWorker: Worker;
 let taskClient: any;
 let csvFiles: { name: string; content: string }[] = [];
 
-type executionState = "init" | "idle" | "running" | "awaitingInput" | "awaitingUpload";
+type executionState = "init" | "idle" | "running" | "awaitingText" | "awaitingImg" | "awaitingCsv";
 
 let curExecutionState: executionState = "init";
 async function initWorker(){
@@ -49,10 +49,12 @@ async function updateOutput(outputArr: Array<Object>) {
       const parsed = parseInputMessage(part["text"]);
       console.log(parsed);
       chatManager.chatOutput(parsed.text, parsed.line_no)
-      if (parsed.input_type == "string") {
-        curExecutionState = "awaitingInput"
+      if (parsed.input_type == "img") {
+        curExecutionState = "awaitingImg";
+      } else if (parsed.input_type == "table") {
+        curExecutionState = "awaitingCsv";
       } else {
-        curExecutionState = "awaitingUpload"
+        curExecutionState = "awaitingText";
       }
     } else if(type == "input") {
       console.log(part["text"]);
@@ -142,7 +144,7 @@ async function handleMain() {
 }
 
 async function computeInput(input: string) {
-  if (curExecutionState == "awaitingInput") {
+  if (curExecutionState == "awaitingText") {
     taskClient.writeMessage(input)
     curExecutionState = "running"
   } else {
@@ -151,37 +153,32 @@ async function computeInput(input: string) {
 }
 
 async function computeUpload(upload: File) {
-  if (curExecutionState === "awaitingUpload") {
-    const reader = new FileReader();
+  const reader = new FileReader();
 
-    reader.onload = async () => {
-      if (upload.type.startsWith("image/")) {
-        // Bild wird als Base64 gelesen
-        const base64Image = (reader.result as string).split(",")[1]; // Entfernt "data:image/png;base64,"
-        taskClient.writeMessage(base64Image);
-      } else if (upload.type === "text/csv") {
-        // CSV wird als Text gelesen und in Base64 umgewandelt
-        const textData = reader.result as string;
-        const base64CSV = btoa(textData); // Text in Base64 umwandeln
-        taskClient.writeMessage(base64CSV);
-      } else {
-        Output("Dateityp nicht unterstützt.", 0);
-        return;
-      }
-
+  reader.onload = async () => {
+    if (upload.type.startsWith("image/") && curExecutionState === "awaitingImg") {
+      // Bild wird als Base64 gelesen
+      const base64Image = (reader.result as string).split(",")[1];
+      taskClient.writeMessage(base64Image);
       curExecutionState = "running";
-    };
-
-    // Richtige Lesemethode je nach Dateityp wählen
-    if (upload.type.startsWith("image/")) {
-      reader.readAsDataURL(upload);
-    } else if (upload.type === "text/csv") {
-      reader.readAsText(upload);
+    } else if (upload.type === "text/csv" && curExecutionState === "awaitingCsv") {
+      // CSV wird als Text gelesen und in Base64 umgewandelt
+      const textData = reader.result as string;
+      const base64CSV = btoa(textData);
+      taskClient.writeMessage(base64CSV);
+      curExecutionState = "running";
     } else {
-      Output("Dateityp nicht unterstützt.", 0);
+      Output("Unerwarteter Dateityp.", 0);
+      return;
     }
+  };
+    // Je nach aktuellem Zustand nur passende Datei lesen
+  if (curExecutionState === "awaitingImg" && upload.type.startsWith("image/")) {
+    reader.readAsDataURL(upload);
+  } else if (curExecutionState === "awaitingCsv" && upload.type === "text/csv") {
+    reader.readAsText(upload);
   } else {
-    Output("Upload nicht möglich. Bitte warten Sie, bis der Upload aktiv ist.", 0);
+    Output("Datei passt nicht zum erwarteten Typ.", 0);
   }
 }
 
@@ -246,7 +243,7 @@ function updateIcon() {
   awaitSymbol.style.display = 'none';
   readySymbol.style.display = 'none';
 
-  if (curExecutionState == 'awaitingInput' || curExecutionState == 'awaitingUpload') {
+  if (curExecutionState == 'awaitingText' || curExecutionState == 'awaitingImg' || curExecutionState == 'awaitingCsv') {
     awaitSymbol.style.display = 'block';
   } else if (curExecutionState == 'running' || curExecutionState == 'init') {
     loadingSymbol.style.display = 'block';
@@ -262,20 +259,24 @@ function Output(message: string, line_no: number) {
 }
 
 function gotUpload(upload: File) {
-  if(curExecutionState == "awaitingUpload") {
+  if(curExecutionState == 'awaitingImg' || curExecutionState == 'awaitingCsv') {
     computeUpload(upload);
     return true;
-  }
-  else return false;
+  } else if(curExecutionState == 'awaitingText') {
+    Output("Es wird eine Text erwartet und kein Dateiupload", 0)
+    return true;
+  } else return false;
 }
 
 // Function called when the user inputs something
 function gotInput(input: string): boolean {
-  if(curExecutionState == "awaitingInput"){
+  if(curExecutionState == 'awaitingText'){
     computeInput(input);
     return true;
-  }
-  else return false;
+  } else if (curExecutionState == 'awaitingImg' || curExecutionState == 'awaitingCsv') {
+    Output("Es wird eine Datei erwartet und kein Textinput", 0)
+    return true;
+  } else return false;
 }
 
 // Create ChatManager instance
