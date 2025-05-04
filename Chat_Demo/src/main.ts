@@ -77,8 +77,6 @@ async function updateOutput(outputArr: Array<Object>) {
 }
 
 function computeTableOutput(csvText: string) {
-  console.log("Tabelle erhalten") 
-
   // Convert CSV string to File object
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const fileName = `table-${timestamp}.csv`;
@@ -92,14 +90,14 @@ function computeTableOutput(csvText: string) {
 }
 
 function base64ToFile(base64: string, fileName: string): File {
-  const byteCharacters = atob(base64); // Base64-Daten dekodieren
+  const byteCharacters = atob(base64); // decode Base64-data
   const byteNumbers = new Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
   }
   const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: "image/png" }); // Blob mit Typ PNG
-  return new File([blob], fileName, { type: "image/png" }); // In File umwandeln
+  const blob = new Blob([byteArray], { type: "image/png" }); // Blob with type PNG
+  return new File([blob], fileName, { type: "image/png" }); // Convert to file
 }
 
 function parseOuputMessage(logMessage: string): { code_name: string; line_no: number; text: string } {
@@ -121,10 +119,10 @@ function parseInputMessage(logMessage: string): { code_name: string; line_no: nu
   const match = trimmedMessage.match(regex);
   
   if (match) {
-      const code_name = match[1]; // Erster Capturing-Group
-      const line_no = parseInt(match[2], 10); // Zweiter Capturing-Group, in Zahl umwandeln
-      const input_type = match[3]; // Dritter Capturing-Group
-      const text = match[4]; // Vierter Capturing-Group
+      const code_name = match[1]; // First capturing group
+      const line_no = parseInt(match[2], 10); // Second capturing group, converted to number
+      const input_type = match[3]; // Third capturing group
+      const text = match[4]; // Fourth capturing group
       
       return { code_name, line_no, input_type, text };
   }
@@ -144,12 +142,8 @@ async function handleMain() {
 }
 
 async function computeInput(input: string) {
-  if (curExecutionState == "awaitingText") {
-    taskClient.writeMessage(input)
-    curExecutionState = "running"
-  } else {
-    Output('Input nicht möglich. Bitte warten Sie, bis der Input aktiv ist.', 0);
-  }
+  taskClient.writeMessage(input)
+  curExecutionState = "running"
 }
 
 async function computeUpload(upload: File) {
@@ -157,28 +151,26 @@ async function computeUpload(upload: File) {
 
   reader.onload = async () => {
     if (upload.type.startsWith("image/") && curExecutionState === "awaitingImg") {
-      // Bild wird als Base64 gelesen
+      // Image is read as Base64
       const base64Image = (reader.result as string).split(",")[1];
       taskClient.writeMessage(base64Image);
       curExecutionState = "running";
     } else if (upload.type === "text/csv" && curExecutionState === "awaitingCsv") {
-      // CSV wird als Text gelesen und in Base64 umgewandelt
+      // CSV is read as text and converted to Base64
       const textData = reader.result as string;
       const base64CSV = btoa(textData);
       taskClient.writeMessage(base64CSV);
       curExecutionState = "running";
     } else {
-      Output("Unerwarteter Dateityp.", 0);
       return;
     }
   };
-    // Je nach aktuellem Zustand nur passende Datei lesen
   if (curExecutionState === "awaitingImg" && upload.type.startsWith("image/")) {
     reader.readAsDataURL(upload);
   } else if (curExecutionState === "awaitingCsv" && upload.type === "text/csv") {
     reader.readAsText(upload);
   } else {
-    Output("Datei passt nicht zum erwarteten Typ.", 0);
+    Output("File does not match the expected type.", 0);
   }
 }
 
@@ -263,7 +255,7 @@ function gotUpload(upload: File) {
     computeUpload(upload);
     return true;
   } else if(curExecutionState == 'awaitingText') {
-    Output("Es wird eine Text erwartet und kein Dateiupload", 0)
+    Output("A text is expected and not a file upload", 0)
     return true;
   } else return false;
 }
@@ -274,7 +266,7 @@ function gotInput(input: string): boolean {
     computeInput(input);
     return true;
   } else if (curExecutionState == 'awaitingImg' || curExecutionState == 'awaitingCsv') {
-    Output("Es wird eine Datei erwartet und kein Textinput", 0)
+    Output("A file is expected and no text input", 0)
     return true;
   } else return false;
 }
@@ -303,7 +295,7 @@ if (editorElement) {
     theme: "vs-dark",
   });
 } else {
-  console.error("Element mit ID 'monacoEditor' nicht gefunden.");
+  console.error("Element with ID 'monacoEditor' not found.");
 }
 
 function downloadCodeAsFile(filename: string, content: string) {
