@@ -102,12 +102,12 @@ function base64ToFile(base64: string, fileName: string): File {
 
 function parseOuputMessage(logMessage: string): { code_name: string; line_no: number; text: string } {
   const trimedMessage = logMessage.trim()
-  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764\s+([\s\S]+)$/;
+  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764(?:\s+(.+))?$/;
   const match = trimedMessage.match(regex);
   if (match) {
       const code_name = match[1]; // First capturing group
       const line_no = parseInt(match[2], 10); // Second capturing group, converted to number
-      const text = match[3]; // Third capturing group
+      const text = match[3] ?? ""; // Third capturing group
       return { code_name, line_no, text };
   }
   return {code_name: "Error", line_no: 42, text: logMessage};
@@ -115,14 +115,14 @@ function parseOuputMessage(logMessage: string): { code_name: string; line_no: nu
 
 function parseInputMessage(logMessage: string): { code_name: string; line_no: number; input_type: string; text: string } {
   const trimmedMessage = logMessage.trim();
-  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764\s+\u3333(.+?)\u3333\s+(.+)$/;
+  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764\s+\u3333(.+?)\u3333(?:\s+(.+))?$/;
   const match = trimmedMessage.match(regex);
   
   if (match) {
       const code_name = match[1]; // First capturing group
       const line_no = parseInt(match[2], 10); // Second capturing group, converted to number
       const input_type = match[3]; // Third capturing group
-      const text = match[4]; // Fourth capturing group
+      const text = match[4] ?? ""; // Fourth capturing group
       
       return { code_name, line_no, input_type, text };
   }
