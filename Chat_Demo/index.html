@@ -15,12 +15,21 @@
               <!-- Linke Spalte: Großes Texteingabefeld -->
               <div class="col-md-8 col-lg-7">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header uniform-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <h5 class="mb-0">Python-Code-Eingabe</h5>
-                    </div>
+                        <a href="documentation.html" target="_blank" style="
+                          padding: 8px 10px;
+                          background-color: #007BFF;
+                          color: white;
+                          text-decoration: none;
+                          border-radius: 4px;
+                          font-weight: bold;">
+                          📄 Zur Befehlsdokumentation
+                        </a>
+                      </div>
                     <div class="card-body">
                         <div class="card-footer p-3">
-                          <div id="monacoEditor" style="height: calc(100vh - 200px); width: 100%;"></div>
+                          <div id="monacoEditor" style="height: calc(100vh - 220px); width: 100%;"></div>
                         </div>
                         <!-- Verstecktes Datei-Upload-Input -->
                         <input type="file" id="uploadCodeButton" accept=".py" style="display: none;">
@@ -35,10 +44,10 @@
                 <!-- Rechte Spalte: Chat -->
                 <div class="col-md-4 col-lg-5">
                   <div class="card" id="chatWindow">
-                      <div class="card-header">
+                    <div class="card-header uniform-header">
                           <h5 class="mb-0">Chat</h5>
                       </div>
-                      <div class="card-body" data-mdb-perfect-scrollbar-init style="position: relative; height: calc(100vh - 160px)" id="chat">
+                      <div class="card-body" data-mdb-perfect-scrollbar-init style="position: relative; height: calc(100vh - 180px)" id="chat">
                           <div id="chat-container"></div>
                       </div>
                       <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">

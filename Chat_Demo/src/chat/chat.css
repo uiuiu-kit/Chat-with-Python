@@ -16,6 +16,14 @@
     margin-top: -35px;
 }
 
+.uniform-header {
+    min-height: 60px; /* oder eine Höhe, die dir gefällt */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+
 .divider:after,
 .divider:before {
     content: "";
