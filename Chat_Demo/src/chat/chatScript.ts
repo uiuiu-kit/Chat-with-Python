@@ -218,7 +218,7 @@ export class ChatManager {
         // Bestimmen, welche Zeilen angezeigt werden sollen
         let visibleRows: string[][] = [];
         if (totalRows > 20) {
-            visibleRows = [...rows.slice(0, 5), ["...".repeat(totalCols)], ...rows.slice(-5)];
+            visibleRows = [...rows.slice(0, 5), ["..."], ...rows.slice(-5)];
         } else {
             visibleRows = rows;
         }
