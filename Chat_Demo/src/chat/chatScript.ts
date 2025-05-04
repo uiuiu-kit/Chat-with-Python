@@ -67,16 +67,28 @@ export class ChatManager {
 
                 // Wrapper-DIV erstellen
                 const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
                 wrapper.appendChild(tableElement);
+                
 
                 // Download-Link erstellen
                 const blob = new Blob([message], { type: 'text/csv' });
                 const url = URL.createObjectURL(blob);
                 const downloadLink = document.createElement('a');
                 downloadLink.href = url;
-                downloadLink.download = "table.csv";  // evtl. Endung ergänzen
-                downloadLink.textContent = `Download Table`;
-                downloadLink.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'mt-2');
+                downloadLink.download = "table.csv";
+                downloadLink.classList.add('btn');
+                const image = document.createElement('img');
+                image.src = 'src/chat/chat_img/downloading.png';
+                image.alt = 'Download Table';
+                image.style.width = '30px';
+                image.style.height = '30px';
+                downloadLink.style.position = 'absolute';
+                downloadLink.style.top = '0px';
+                downloadLink.style.right = '-40px';
+
+                // Bild zum Link hinzufügen
+                downloadLink.appendChild(image);
 
                 // Download-Link zum Wrapper hinzufügen
                 wrapper.appendChild(downloadLink);
