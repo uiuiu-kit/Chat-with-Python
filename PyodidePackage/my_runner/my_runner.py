@@ -76,14 +76,14 @@ class MyRunner(PyodideRunner):
         elif input_type == "table":
             base64Table = self.readline(prompt=prompt)[:-1]
             table_data = base64.b64decode(base64Table)
-            return pd.read_csv(io.StringIO(table_data.decode("utf-8")), header=None)
+            return pd.read_csv(io.StringIO(table_data.decode("utf-8")))
         else:
             return self.readline(prompt=prompt)[:-1]
 
     def send_table(self, table):
         code_name, line_no = self.get_caller_info(3)
         prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764"
-        tabel_csv = table.to_csv(header=False, index = False)
+        tabel_csv = table.to_csv(index = False)
         self.output("table_output", f"{prefix} {tabel_csv}")
 
     def overwrite_print(self):

@@ -102,7 +102,7 @@ function base64ToFile(base64: string, fileName: string): File {
 
 function parseOuputMessage(logMessage: string): { code_name: string; line_no: number; text: string } {
   const trimedMessage = logMessage.trim()
-  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764(?:\s+(.+))?$/;
+  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764(?:\s+([\s\S]+))?$/;
   const match = trimedMessage.match(regex);
   if (match) {
       const code_name = match[1]; // First capturing group
@@ -115,7 +115,7 @@ function parseOuputMessage(logMessage: string): { code_name: string; line_no: nu
 
 function parseInputMessage(logMessage: string): { code_name: string; line_no: number; input_type: string; text: string } {
   const trimmedMessage = logMessage.trim();
-  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764\s+\u3333(.+?)\u3333(?:\s+(.+))?$/;
+  const regex = /^\u2764\u1234(.+?):(\d+)\u1234\u2764\s+\u3333(.+?)\u3333(?:\s+([\s\S]+))?$/;
   const match = trimmedMessage.match(regex);
   
   if (match) {
