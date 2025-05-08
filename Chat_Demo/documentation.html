@@ -55,7 +55,9 @@
 
   <section>
     <h2><code>inputTable(Promt:string) -> pandas.dataframe</code></h2>
-    <p>With the command <code>inputTable</code> you can ask the user of your program for a table. If you upload a table in the chat, it will be converted into a pandas dataframe object which you can use in the further course. With <code>print([name of your dataframe])</code> you can display the table in the chat. </p>
+    <p>With the command <code>inputTable</code> you can ask the user of your program for a table. If you upload a table in the chat, it will be converted into a pandas dataframe object which you can use in the further course. With <code>print([name of your dataframe])</code> you can display the table in the chat. 
+      <br>
+      The first row of the specified csv table becomes the head of the data frame. The index is ignored in input and output </p>
     <p>Example usage:</p>
     <pre><code>df = inputTable("Submit a table")  # asks for a table
  print(df)                          # displays the table in the chat</code></pre>
