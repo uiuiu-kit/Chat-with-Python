@@ -17,7 +17,7 @@ let pyodideWorker: Worker;
 let taskClient: any;
 let csvFiles: { name: string; content: string }[] = [];
 
-type executionState = "init" | "idle" | "running" | "awaitingText" | "awaitingImg" | "awaitingCsv";
+type executionState = "init" | "idle" | "running" | "awaitingText" | "awaitingImg" | "awaitingCsv" | "aborted";
 
 let curExecutionState: executionState = "init";
 async function initWorker(){
@@ -37,6 +37,9 @@ initWorker()
 
 
 async function updateOutput(outputArr: Array<Object>) {
+  if (curExecutionState === "aborted"){
+    return;
+  }
   for (const part of outputArr) {
     const type = part["type"]
     if (["stderr", "traceback", "syntax_error"].includes(type)) {
@@ -195,7 +198,7 @@ async function runCode(code: string) {
 }
 
 async function abortPyodide() {
-  curExecutionState = "init"
+  curExecutionState = "aborted"
   await taskClient.interrupt();
   await initWorker()
 }
