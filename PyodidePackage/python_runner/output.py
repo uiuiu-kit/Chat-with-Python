@@ -40,8 +40,9 @@ class OutputBuffer:
         else:
             self.parts.append(dict(type=output_type, text=text, **extra))
 
-        if self.should_flush():
-            self.flush()
+        # if self.should_flush():
+        #    self.flush()
+        # commentet cause it flushes when there a empty part added to the output buffer -> triggers a unwanted flush
 
     def should_flush(self) -> bool:
         """
