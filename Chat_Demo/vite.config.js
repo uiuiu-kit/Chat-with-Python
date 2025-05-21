@@ -3,9 +3,6 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
     build: {
-        rollupOptions: {
-            external: ['pyodide-worker-runner', 'comlink', 'comsync'],
-        },
     },
     worker: {
         format: 'es'
@@ -22,4 +19,5 @@ export default defineConfig({
         '@': '/src',
       },
     },
+    base: './',
 });

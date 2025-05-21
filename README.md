@@ -40,3 +40,14 @@ npm run dev
 ```
 
 This will start the Vite development server. Open your browser and go to the URL shown in the terminal.
+
+### Building and Serving for Production
+
+To create an optimized production build and serve it locally, run:
+``` bash
+npm run build
+npm run serve
+```
+npm run build generates a production-ready version of the app in the dist directory.
+npm run serve starts a local static file server to preview the production build.
+Then, open your browser and go to the URL shown in the terminal (by default: http://localhost:4173).
