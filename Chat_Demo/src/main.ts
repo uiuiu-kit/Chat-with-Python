@@ -9,6 +9,33 @@ import {ChatManager} from './chat/chatScript';
 
 setInterval(updateIcon, 500);
 
+// ---- Debugging ---- 
+if ('serviceWorker' in navigator) {
+  console.log('Service Workers are supported.');
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    if (registrations.length > 0) {
+      console.log('Service Workers registered:', registrations);
+    } else {
+      console.log('No Service Workers registered.');
+    }
+  });
+} else {
+  console.log('Service Workers are NOT supported.');
+}
+
+if (typeof SharedArrayBuffer !== 'undefined') {
+  console.log('SharedArrayBuffer is supported.');
+} else {
+  console.log('SharedArrayBuffer is NOT supported.');
+}
+
+if (typeof Atomics !== 'undefined' && typeof postMessage === 'function') {
+  console.log('Atomics and postMessage are supported.');
+} else {
+  console.log('Atomics or postMessage are NOT supported.');
+}
+
+
 // ---------------- Webworker Functionality -------------------------------
 
 // Setup the channel to communicat between the main thread and the worker thread
