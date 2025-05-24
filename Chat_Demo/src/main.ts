@@ -239,6 +239,23 @@ document.getElementById('pythonRunButton')!.addEventListener('click', function()
   }
 })
 
+// Button for downloading the code
+document.getElementById('downloadCodeButton')!.addEventListener('click', function() {
+  if (editor) {
+    const code = editor.getValue();
+    downloadCodeAsFile('code.py', code);
+  }
+});
+
+document.getElementById('downloadExamples')!.addEventListener('click', function() {
+  const link = document.createElement('a');
+  link.href = '/examples.zip';
+  link.download = 'examples.zip';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+});
+
 // Click on the visible button triggers the hidden file upload input
 document.getElementById('customUploadCodeButton')!.addEventListener('click', function() {
   (document.getElementById('uploadCodeButton') as HTMLInputElement).click();
@@ -337,14 +354,6 @@ function downloadCodeAsFile(filename: string, content: string) {
   link.click();
   document.body.removeChild(link);
 }
-
-// Button for downloading the code
-document.getElementById('downloadCodeButton')!.addEventListener('click', function() {
-  if (editor) {
-    const code = editor.getValue();
-    downloadCodeAsFile('code.py', code);
-  }
-});
 
 function loadCodeIntoEditor(fileContent: string) {
   // Set the editor content to the loaded code
