@@ -69,16 +69,17 @@ class MyRunner(PyodideRunner):
         code_name, line_no = self.get_caller_info(3)
         prefix = f"\u2764\u1234{code_name}:{line_no}\u1234\u2764 \u3333{input_type}\u3333"
         self.output("input_prompt", prefix + " " + prompt)
+        input = self.readline(prompt=prompt)[:-1]
+        self.output_buffer.flush()
         if input_type == "img":
-            base64Image = self.readline(prompt=prompt)[:-1]
-            image_data = base64.b64decode(base64Image)
+            image_data = base64.b64decode(input)
             return Image.open(io.BytesIO(image_data))
         elif input_type == "table":
-            base64Table = self.readline(prompt=prompt)[:-1]
-            table_data = base64.b64decode(base64Table)
+            table_data = base64.b64decode(input)
             return pd.read_csv(io.StringIO(table_data.decode("utf-8")))
         else:
-            return self.readline(prompt=prompt)[:-1]
+            return input
+        
 
     def send_table(self, table):
         code_name, line_no = self.get_caller_info(3)
