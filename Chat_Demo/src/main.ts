@@ -284,7 +284,7 @@ function updateIcon() {
 
   if (curExecutionState == 'awaitingText' || curExecutionState == 'awaitingImg' || curExecutionState == 'awaitingCsv') {
     awaitSymbol.style.display = 'block';
-  } else if (curExecutionState == 'running' || curExecutionState == 'init') {
+  } else if (curExecutionState == 'running' || curExecutionState == 'init' || curExecutionState == 'aborted') {
     loadingSymbol.style.display = 'block';
   } else {
     readySymbol.style.display = 'block';
