@@ -3,8 +3,8 @@ import {PyodideClient} from "pyodide-worker-runner";
 import {makeChannel} from "sync-message";
 import * as Comlink from "comlink";
 
-import * as monaco from 'monaco-editor';
-
+import {EditorView, basicSetup} from "codemirror";
+import {python} from "@codemirror/lang-python";
 import {ChatManager} from './chat/chatScript';
 
 setInterval(updateIcon, 500);
@@ -234,7 +234,7 @@ async function abortPyodide() {
 
 document.getElementById('pythonRunButton')!.addEventListener('click', function() {
   if (editor) {
-    const code = editor?.getValue()
+    const code = editor.state.doc.toString();
     runCode(code);
   }
 })
@@ -242,7 +242,7 @@ document.getElementById('pythonRunButton')!.addEventListener('click', function()
 // Button for downloading the code
 document.getElementById('downloadCodeButton')!.addEventListener('click', function() {
   if (editor) {
-    const code = editor.getValue();
+    const code = editor.state.doc.toString();
     downloadCodeAsFile('code.py', code);
   }
 });
@@ -331,18 +331,18 @@ const chatManager = new ChatManager({
 
 // monacoEditor
 
-let editor: monaco.editor.IStandaloneCodeEditor | null = null;
+let editor: EditorView | null = null;
 
-const editorElement = document.getElementById('monacoEditor');
+const editorElement = document.getElementById('codeMirrorEditor');
 
 if (editorElement) {
-  editor = monaco.editor.create(editorElement, {
-    value: "input('Hello, Monaco!')",
-    language: "python",
-    theme: "vs-dark",
+  editor = new EditorView({
+    doc: "input('Hello, CodeMirror!')",
+    extensions: [basicSetup, python()],
+    parent: editorElement,
   });
 } else {
-  console.error("Element with ID 'monacoEditor' not found.");
+  console.error("Element with ID 'codeMirrorEditor' not found.");
 }
 
 function downloadCodeAsFile(filename: string, content: string) {
@@ -358,7 +358,9 @@ function downloadCodeAsFile(filename: string, content: string) {
 function loadCodeIntoEditor(fileContent: string) {
   // Set the editor content to the loaded code
   if (editor){
-    editor.setValue(fileContent);
+    editor.dispatch({
+      changes: { from: 0, to: editor.state.doc.length, insert: fileContent }
+    });
   }
 }
 
