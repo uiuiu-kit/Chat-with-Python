@@ -45,6 +45,7 @@ let taskClient: any;
 let csvFiles: { name: string; content: string }[] = [];
 
 type executionState = "init" | "idle" | "running" | "awaitingText" | "awaitingImg" | "awaitingCsv" | "aborted";
+export type inputResponse = "expected" | "notExpected" | "expectedFileNotText" | "expectedTextNotFile";
 
 let curExecutionState: executionState = "init";
 async function initWorker(){
@@ -200,7 +201,7 @@ async function computeUpload(upload: File) {
   } else if (curExecutionState === "awaitingCsv" && upload.type === "text/csv") {
     reader.readAsText(upload);
   } else {
-    Output("File does not match the expected type.", 0);
+    Output("File does not match the expected type. Please provide a matching file.", 0);
   }
 }
 
@@ -300,22 +301,20 @@ function Output(message: string, line_no: number) {
 function gotUpload(upload: File) {
   if(curExecutionState == 'awaitingImg' || curExecutionState == 'awaitingCsv') {
     computeUpload(upload);
-    return true;
+    return "expected";
   } else if(curExecutionState == 'awaitingText') {
-    Output("A text is expected and not a file upload", 0)
-    return true;
-  } else return false;
+    return "expectedTextNotFile";
+  } else return "notExpected";
 }
 
 // Function called when the user inputs something
-function gotInput(input: string): boolean {
+function gotInput(input: string): inputResponse {
   if(curExecutionState == 'awaitingText'){
     computeInput(input);
-    return true;
+    return "expected";
   } else if (curExecutionState == 'awaitingImg' || curExecutionState == 'awaitingCsv') {
-    Output("A file is expected and no text input", 0)
-    return true;
-  } else return false;
+    return "expectedFileNotText";
+  } else return "notExpected";
 }
 
 // Create ChatManager instance

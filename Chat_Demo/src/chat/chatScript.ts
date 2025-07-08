@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import { Tooltip } from 'bootstrap';
+import { inputResponse } from '../main'
 
 
 interface ChatManagerOptions {
@@ -8,8 +9,8 @@ interface ChatManagerOptions {
     inputFieldId: string;
     sendButtonId: string;
     fileInputButtonId: string;
-    onInput?: (input: string) => boolean;
-    onUpload?: (file: File) => boolean;
+    onInput?: (input: string) => inputResponse;
+    onUpload?: (file: File) => inputResponse;
 }
 
 export class ChatManager {
@@ -17,8 +18,8 @@ export class ChatManager {
     private inputField: HTMLInputElement | null;
     private sendButton: HTMLButtonElement | null;
     private fileInputButton: HTMLInputElement | null;
-    private onInput: ((input: string) => boolean) | undefined;
-    private onUpload: ((file: File) => boolean) | undefined;
+    private onInput: ((input: string) => inputResponse) | undefined;
+    private onUpload: ((file: File) => inputResponse) | undefined;
     private executionCounter: number;
     
     constructor({ chatContainerId, inputFieldId, sendButtonId, fileInputButtonId, onInput, onUpload }: ChatManagerOptions) {
@@ -147,7 +148,7 @@ export class ChatManager {
     
 
     // Methode für Chat-Eingabe
-    chatInput(message: string | File, expected: boolean): void {
+    chatInput(message: string | File, response: inputResponse): void {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-4', 'pt-1');
     
@@ -182,7 +183,7 @@ export class ChatManager {
         messageContainer.appendChild(textContainer);
         this.chatContainer?.appendChild(messageContainer);
         // Vielleicht noch austauschen
-        if(! expected) {
+        if(response == "notExpected") {
 
             const notificationContainer = document.createElement('div');
             notificationContainer.classList.add('d-flex', 'flex-row', 'justify-content-end');
@@ -194,6 +195,22 @@ export class ChatManager {
             notExpectedNotification.setAttribute('data-bs-toggle', 'tooltip');
             notExpectedNotification.setAttribute('title', 'This message was sent before the Python program expected any input, so the input was not delivered and will have no effect on the execution of the Python code.');
             const tooltipTrigger = new Tooltip(notExpectedNotification, { placement: 'bottom' });
+        } else if (response == "expectedFileNotText"){
+            const notificationContainer = document.createElement('div');
+            notificationContainer.classList.add('d-flex', 'flex-row', 'justify-content-end');
+            const notExpectedNotification = document.createElement('p');
+            notExpectedNotification.classList.add('small', 'p-2', 'me-4', 'rounded-3','bg-warning', 'overlap-message');
+            notExpectedNotification.textContent = 'Expected a File not a Text. Please provide a File.';
+            notificationContainer.appendChild(notExpectedNotification);
+            this.chatContainer?.appendChild(notificationContainer);
+        } else if (response == "expectedTextNotFile"){
+            const notificationContainer = document.createElement('div');
+            notificationContainer.classList.add('d-flex', 'flex-row', 'justify-content-end');
+            const notExpectedNotification = document.createElement('p');
+            notExpectedNotification.classList.add('small', 'p-2', 'me-4', 'rounded-3','bg-warning', 'overlap-message');
+            notExpectedNotification.textContent = 'Expected a Text not a File. Please provide a Text.';
+            notificationContainer.appendChild(notExpectedNotification);
+            this.chatContainer?.appendChild(notificationContainer);
         }
         this.scrollToBottom();
     }
@@ -278,8 +295,8 @@ export class ChatManager {
 
             // Callback aufrufen, wenn definiert
             if (this.onInput) {
-                const expected = this.onInput(input);
-                this.chatInput(input, expected)
+                const response = this.onInput(input);
+                this.chatInput(input, response)
             }
 
             // Eingabefeld leeren
@@ -295,8 +312,8 @@ export class ChatManager {
 
                 // Callback aufrufen, wenn definiert
                 if (this.onUpload) {
-                    const expected = this.onUpload(upload);
-                    this.chatInput(upload, expected);
+                    const response = this.onUpload(upload);
+                    this.chatInput(upload, response);
                 }
             }
             
