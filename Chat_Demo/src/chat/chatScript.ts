@@ -240,8 +240,17 @@ export class ChatManager {
             visibleRows = rows;
         }
     
+        // Reduziere die Anzahl der Spalten, wenn mehr als 20 vorhanden sind
+        let visibleRowsWithCols: string[][] = visibleRows.map(row => {
+            if (row.length > 10) {
+                return [...row.slice(0, 3), "...", ...row.slice(-3)];
+            } else {
+                return row;
+            }
+        });
+    
         // Tabelle generieren
-        visibleRows.forEach((rowText, rowIndex) => {
+        visibleRowsWithCols.forEach((rowText, rowIndex) => {
             const row = document.createElement('tr');
     
             rowText.forEach(cellText => {
