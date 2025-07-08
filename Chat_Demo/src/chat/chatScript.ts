@@ -220,7 +220,7 @@ export class ChatManager {
         tableContainer.classList.add('p-2', 'bg-light', 'border', 'rounded'); // Bootstrap-Styling
     
         const table = document.createElement('table');
-        table.classList.add('table', 'table-bordered', 'table-sm');
+        table.classList.add('table', 'table-bordered', 'table-sm', 'chat-table');
     
         const rows = csvText.trim().split('\n').map(row => row.split(',')); // CSV in 2D-Array umwandeln
         const totalRows = rows.length;
@@ -228,7 +228,7 @@ export class ChatManager {
     
         // Anzeige der Anzahl der Zeilen & Spalten
         const infoText = document.createElement('p');
-        infoText.textContent = `${totalRows} Zeilen, ${totalCols} Spalten`;
+        infoText.textContent = `${totalRows} Rows, ${totalCols} Columns`;
         infoText.classList.add('mb-2', 'fw-bold');
         tableContainer.appendChild(infoText);
     
@@ -245,7 +245,12 @@ export class ChatManager {
             const row = document.createElement('tr');
     
             rowText.forEach(cellText => {
-                const cell = document.createElement('td'); // Erste Zeile = Header
+                let cell;
+                if (rowIndex === 0) {
+                    cell = document.createElement('th'); // Erste Zeile = Header
+                } else {
+                    cell = document.createElement('td');
+                }
                 cell.textContent = cellText.trim();
                 row.appendChild(cell);
             });

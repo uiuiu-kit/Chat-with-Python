@@ -56,3 +56,18 @@
 table tr:last-child td {
     border-bottom: none;
 }
+
+.chat-table td,
+.chat-table th {
+    border-bottom: 1px solid #6c757d; /* Darker border color for row separators */
+}
+
+.chat-table td:not(:last-child),
+.chat-table th:not(:last-child) {
+    border-right: 2px solid #6c757d; /* Darker border color for higher contrast */
+}
+
+.chat-table td,
+.chat-table th {
+    padding: 0.75rem 1.25rem; /* Increase padding for more space in cells */
+}
