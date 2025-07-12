@@ -4,6 +4,7 @@ import {makeChannel} from "sync-message";
 import * as Comlink from "comlink";
 
 import {EditorView, basicSetup} from "codemirror";
+import { autocompletion } from "@codemirror/autocomplete"
 import {python} from "@codemirror/lang-python";
 import {ChatManager} from './chat/chatScript';
 
@@ -328,8 +329,6 @@ const chatManager = new ChatManager({
 });
 // ------------- Editor Functionality -------------------------
 
-// monacoEditor
-
 let editor: EditorView | null = null;
 
 const editorElement = document.getElementById('codeMirrorEditor');
@@ -337,7 +336,7 @@ const editorElement = document.getElementById('codeMirrorEditor');
 if (editorElement) {
   editor = new EditorView({
     doc: "input('Hello, CodeMirror!')",
-    extensions: [basicSetup, python()],
+    extensions: [basicSetup, python(), autocompletion({ override: [() => null] })], // verhindert alle Autocompletions
     parent: editorElement,
   });
 } else {
