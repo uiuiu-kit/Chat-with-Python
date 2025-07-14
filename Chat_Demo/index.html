@@ -34,10 +34,20 @@
                         <!-- Verstecktes Datei-Upload-Input -->
                         <input type="file" id="uploadCodeButton" accept=".py" style="display: none;">
                         <!-- Sichtbarer Button im Bootstrap-Stil -->
-                        <button class="btn btn-primary mt-3" id="customUploadCodeButton">Upload Python Code</button>
-                        <button class="btn btn-primary mt-3" id="downloadCodeButton">Download Code</button>
-                        <button class="btn btn-primary mt-3" id="pythonRunButton">Run python</button>
-                        <button class="btn btn-primary mt-3" id="stopCodeButton">Stop python</button>
+                        <button class="btn btn-primary mt-3" id="customUploadCodeButton" title="Upload Python code file" style="display: inline-flex; align-items: center; gap: 6px;">
+                            <img src="/src/Icons/upload-big-arrow.png" alt="Upload Icon" width="20" height="20" />
+                            Code
+                        </button>
+                        <button class="btn btn-primary mt-3" id="downloadCodeButton" title="Download current code" style="display: inline-flex; align-items: center; gap: 6px;">
+                            <img src="/src/Icons/downloading.png" alt="Download Icon" width="20" height="20" />
+                            Code
+                        </button>
+                        <button class="btn mt-3" id="pythonRunButton" title="Run Python code" style="background-color: #28a745; color: white; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border-radius: 4px;">
+                            <img src="/src/Icons/play-button.png" alt="Run Icon" width="24" height="24" />
+                        </button>
+                        <button class="btn mt-3" id="stopCodeButton" title="Stop Python execution" style="background-color: #dc3545; color: white; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border-radius: 4px;">
+                            <img src="/src/Icons/stop-button.png" alt="Stop Icon" width="24" height="24" />
+                        </button>
                         <button class="btn btn-secondary mt-3" id="downloadExamples">Download Examples</button>
                     </div>
                 </div>
