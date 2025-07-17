@@ -3,6 +3,7 @@ import 'bootstrap';
 import { Tooltip } from 'bootstrap';
 import { inputResponse } from '../main'
 
+import downloadingImg from './chat_img/downloading.png';
 
 interface ChatManagerOptions {
     chatContainerId: string;
@@ -80,7 +81,7 @@ export class ChatManager {
                 downloadLink.download = "table.csv";
                 downloadLink.classList.add('btn');
                 const image = document.createElement('img');
-                image.src = 'src/chat/chat_img/downloading.png';
+                image.src = downloadingImg;
                 image.alt = 'Download Table';
                 image.style.width = '30px';
                 image.style.height = '30px';
