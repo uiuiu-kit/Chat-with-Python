@@ -19,7 +19,7 @@
     "monaco-editor": "^0.52.2",
     "pyodide-worker-runner": "^1.4.0",
     "@codemirror/lang-python": "^6.2.1",
-    "@codemirror/extension-autocomplete": "^6.2.1",
+    "@codemirror/autocomplete": "^6.2.1",
     "codemirror": "^6.2.1"
   },
   "devDependencies": {
