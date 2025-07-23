@@ -29,7 +29,7 @@
                       </div>
                     <div class="card-body">
                         <div class="card-footer p-3">
-                        <div id="codeMirrorEditor" style="height: calc(100vh - 220px); width: 100%;"></div>
+                        <div id="codeMirrorEditor" style="height: calc(100vh - 220px); width: 100%;overflow: auto; "></div>
                         </div>
                         <!-- Verstecktes Datei-Upload-Input -->
                         <input type="file" id="uploadCodeButton" accept=".py" style="display: none;">
@@ -48,7 +48,17 @@
                         <button class="btn mt-3" id="stopCodeButton" title="Stop Python execution" style="background-color: #dc3545; color: white; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border-radius: 4px;">
                             <img src="/src/Icons/stop-button.png" alt="Stop Icon" width="24" height="24" />
                         </button>
-                        <button class="btn btn-secondary mt-3" id="downloadExamples">Download Examples</button>
+                        <button class="btn btn-primary dropdown-toggle mt-3" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="display: inline-flex; align-items: center; gap: 6px;">
+                            Select Code Example
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="#" >caesar cipher</a></li>
+                                <li><a class="dropdown-item" href="#" >endangerd speciec</a></li>
+                                <li><a class="dropdown-item" href="#" >InputText</a></li>
+                                <li><a class="dropdown-item" href="#" >InputCsv</a></li>
+                                <li><a class="dropdown-item" href="#" >InputImg</a></li>
+                            </ul>
+                        <button class="btn btn-secondary mt-3" id="downloadExampleData">Download Example Data</button>
                     </div>
                 </div>
               </div>

@@ -249,7 +249,7 @@ document.getElementById('downloadCodeButton')!.addEventListener('click', functio
   }
 });
 
-document.getElementById('downloadExamples')!.addEventListener('click', function() {
+document.getElementById('downloadExampleData')!.addEventListener('click', function() {
   const link = document.createElement('a');
   link.href = '/examples.zip';
   link.download = 'examples.zip';
@@ -263,11 +263,19 @@ document.getElementById('customUploadCodeButton')!.addEventListener('click', fun
   (document.getElementById('uploadCodeButton') as HTMLInputElement).click();
 });
 
-// Optional: Select a file and display the filename in the console
-document.getElementById('uploadCodeButton')!.addEventListener('change', function() {
-  const file = (this as HTMLInputElement).files?.[0];
+document.getElementById('uploadCodeButton')!.addEventListener('change', function(event) {
+  const file = (event.target as HTMLInputElement).files?.[0];
   if (file) {
       console.log('Uploaded file:', file.name);
+  }
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+      loadCodeIntoEditor(e.target!.result as string);
+  };
+
+  if (file) {
+    reader.readAsText(file);
   }
 });
 
@@ -291,6 +299,53 @@ function updateIcon() {
   } else {
     readySymbol.style.display = 'block';
   }
+}
+
+// Beispiele auswählen
+
+window.addEventListener("DOMContentLoaded", () => {
+  const items = document.querySelectorAll(".dropdown-item");
+
+  items.forEach((item, index) => {
+    item.addEventListener("click", () => {
+      selectExample(index + 1); // 1-basiert
+    });
+  });
+});
+
+function selectExample(num:number) {
+  let path = "";
+  switch (num) {
+    case 1:
+      path = "/caesar_cipher.py";
+      break;
+    case 2:
+      path = "/endangerd_speciec.py";
+      break
+    case 3:
+      path = "/InputText.py";
+      break;
+    case 4:
+      path = "/UploadCsv.py" ;
+      break
+    case 5:
+      path = "/UploadImg.py";
+      break;
+    default:
+      break;
+    
+  }
+  fetch(path)
+    .then(response => {
+      if (!response.ok) throw new Error("Datei konnte nicht geladen werden");
+      return response.text();
+    })
+    .then(data => {
+      loadCodeIntoEditor(data); // Deine bestehende Funktion
+    })
+    .catch(error => {
+      console.error("Fehler beim Laden der Datei:", error);
+    });
 }
 
 // --------------- Chat Functionality ----------------------
@@ -361,16 +416,3 @@ function loadCodeIntoEditor(fileContent: string) {
     });
   }
 }
-
-document.getElementById('uploadCodeButton')!.addEventListener('change', function(event) {
-  const file = (event.target as HTMLInputElement).files?.[0];
-  const reader = new FileReader();
-
-  reader.onload = function(e) {
-      loadCodeIntoEditor(e.target!.result as string);
-  };
-
-  if (file) {
-    reader.readAsText(file);
-  }
-});
