@@ -8,7 +8,7 @@
 }
 
 .bg-danger-light {
-    background-color: #f8d7da; /* Helles Bootstrap-Rot */
+    background-color: #f8d7da; /* Light bootstrap red */
   }
 
 
@@ -17,7 +17,7 @@
 }
 
 .uniform-header {
-    min-height: 60px; /* oder eine Höhe, die dir gefällt */
+    min-height: 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;

@@ -37,7 +37,7 @@ export class ChatManager {
 
     }
 
-    // Methode für Chat-Ausgabe
+    // Method for chat output
     chatOutput(message: string | File, line_no: number): void {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-start', 'align-items-center');
@@ -45,7 +45,7 @@ export class ChatManager {
         const textContainer = document.createElement('div');
         textContainer.classList.add('d-flex', 'align-items-center');
     
-        // Zeilennummer hinzufügen
+        // Add line number
         const lineNumberElement = document.createElement('span');
         lineNumberElement.classList.add('line-number', 'me-2');
         lineNumberElement.style.fontSize = '0.75rem';
@@ -55,7 +55,7 @@ export class ChatManager {
         textContainer.appendChild(lineNumberElement);
     
         if (typeof message === 'string') {
-            // Textnachricht
+            // Text message
             const messageElement = document.createElement('p');
             messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-body-tertiary');
             messageElement.innerHTML = `<pre style="display: inline;">${message}</pre>`;
@@ -67,13 +67,13 @@ export class ChatManager {
                 const csvText = reader.result as string;
                 const tableElement = this.createTableFromCSV(csvText);
 
-                // Wrapper-DIV erstellen
+                // Create wrapper DIV
                 const wrapper = document.createElement('div');
                 wrapper.style.position = 'relative';
                 wrapper.appendChild(tableElement);
                 
 
-                // Download-Link erstellen
+                // Create download link
                 const blob = new Blob([message], { type: 'text/csv' });
                 const url = URL.createObjectURL(blob);
                 const downloadLink = document.createElement('a');
@@ -88,19 +88,13 @@ export class ChatManager {
                 downloadLink.style.position = 'absolute';
                 downloadLink.style.top = '0px';
                 downloadLink.style.right = '-40px';
-
-                // Bild zum Link hinzufügen
                 downloadLink.appendChild(image);
-
-                // Download-Link zum Wrapper hinzufügen
                 wrapper.appendChild(downloadLink);
-
-                // Wrapper in den TextContainer einfügen
                 textContainer.appendChild(wrapper);
             };
             reader.readAsText(message);
         } else if (message instanceof File && message.type.startsWith('image/')) {
-            // Bildnachricht
+            // Image message
             const imageElement = document.createElement('img');
             imageElement.src = URL.createObjectURL(message);
             imageElement.alt = 'Empfangenes Bild';
@@ -114,41 +108,35 @@ export class ChatManager {
         this.scrollToBottom();
     }
     
-    // Methode für Chat-Error-Ausgabe
+    // Method for chat error output
     chatError(message: string, line_no: number): void {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-start', 'align-items-center');
         
 
         const textContainer = document.createElement('div');
-        textContainer.classList.add('d-flex', 'align-items-center'); // Zeileninhalt in einer Linie
+        textContainer.classList.add('d-flex', 'align-items-center');
 
-        // Zeilennummer hinzufügen
+        // Add line number
         const lineNumberElement = document.createElement('span');
-        lineNumberElement.classList.add('line-number', 'me-2'); // Abstand zur Nachricht
+        lineNumberElement.classList.add('line-number', 'me-2');
         lineNumberElement.style.fontSize = '0.75rem';
-        lineNumberElement.style.color = '#6c757d'; // Grauer Farbton
+        lineNumberElement.style.color = '#6c757d';
         lineNumberElement.textContent = `#${line_no}`;
 
-        // Nachricht hinzufügen
+        // Add message
         const messageElement = document.createElement('p');
         messageElement.classList.add('small', 'p-2', 'ms-1', 'mb-1', 'rounded-3', 'bg-danger-light');
         messageElement.innerHTML = "ERROR: " + `<pre style="display: inline;">${message}</pre>`;
-
-        // Elemente in den Textcontainer einfügen
         textContainer.appendChild(lineNumberElement);
         textContainer.appendChild(messageElement);
-
-        // Textcontainer in den Hauptcontainer einfügen
         messageContainer.appendChild(textContainer);
-
-        // Hauptcontainer in den Chat einfügen
         this.chatContainer?.appendChild(messageContainer);
         this.scrollToBottom()
     }
     
 
-    // Methode für Chat-Eingabe
+    // Method for chat input
     chatInput(message: string | File, response: inputResponse): void {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-4', 'pt-1');
@@ -156,14 +144,14 @@ export class ChatManager {
         const textContainer = document.createElement('div');
     
         if (typeof message === 'string') {
-            //  Text anzeigen
+            // Show text
             const messageElement = document.createElement('p');
             messageElement.classList.add('small', 'p-2', 'me-3', 'mb-1', 'rounded-3', 'bg-primary', 'text-white');
             messageElement.textContent = message;
             textContainer.appendChild(messageElement);
         } else if (message instanceof File) {
             if (message.type.startsWith('image/')) {
-                //  Bild anzeigen
+                // Show image
                 const imageElement = document.createElement('img');
                 imageElement.src = URL.createObjectURL(message);
                 imageElement.alt = 'Gesendetes Bild';
@@ -171,7 +159,7 @@ export class ChatManager {
                 imageElement.style.borderRadius = '8px';
                 textContainer.appendChild(imageElement);
             } else if (message.type === 'text/csv') {
-                //  CSV anzeigen
+                // Display CSV
                 const reader = new FileReader();
                 reader.onload = () => {
                     const csvText = reader.result as string;
@@ -183,33 +171,22 @@ export class ChatManager {
         }
         messageContainer.appendChild(textContainer);
         this.chatContainer?.appendChild(messageContainer);
-        // Vielleicht noch austauschen
-        if(response == "notExpected") {
-
+        // Perhaps replace
+        if (response != "expected") {
             const notificationContainer = document.createElement('div');
             notificationContainer.classList.add('d-flex', 'flex-row', 'justify-content-end');
             const notExpectedNotification = document.createElement('p');
             notExpectedNotification.classList.add('small', 'p-2', 'me-4', 'rounded-3','bg-warning', 'overlap-message');
-            notExpectedNotification.textContent = 'Message not deliverd';
-            notificationContainer.appendChild(notExpectedNotification);
-            this.chatContainer?.appendChild(notificationContainer);
-            notExpectedNotification.setAttribute('data-bs-toggle', 'tooltip');
-            notExpectedNotification.setAttribute('title', 'This message was sent before the Python program expected any input, so the input was not delivered and will have no effect on the execution of the Python code.');
-            const tooltipTrigger = new Tooltip(notExpectedNotification, { placement: 'bottom' });
-        } else if (response == "expectedFileNotText"){
-            const notificationContainer = document.createElement('div');
-            notificationContainer.classList.add('d-flex', 'flex-row', 'justify-content-end');
-            const notExpectedNotification = document.createElement('p');
-            notExpectedNotification.classList.add('small', 'p-2', 'me-4', 'rounded-3','bg-warning', 'overlap-message');
-            notExpectedNotification.textContent = 'Expected a File not a Text. Please provide a File.';
-            notificationContainer.appendChild(notExpectedNotification);
-            this.chatContainer?.appendChild(notificationContainer);
-        } else if (response == "expectedTextNotFile"){
-            const notificationContainer = document.createElement('div');
-            notificationContainer.classList.add('d-flex', 'flex-row', 'justify-content-end');
-            const notExpectedNotification = document.createElement('p');
-            notExpectedNotification.classList.add('small', 'p-2', 'me-4', 'rounded-3','bg-warning', 'overlap-message');
-            notExpectedNotification.textContent = 'Expected a Text not a File. Please provide a Text.';
+            if(response == "notExpected") {
+                notExpectedNotification.textContent = 'Message not deliverd';
+                notExpectedNotification.setAttribute('data-bs-toggle', 'tooltip');
+                notExpectedNotification.setAttribute('title', 'This message was sent before the Python program expected any input, so the input was not delivered and will have no effect on the execution of the Python code.');
+                const tooltipTrigger = new Tooltip(notExpectedNotification, { placement: 'bottom' });
+            } else if (response == "expectedFileNotText"){
+                notExpectedNotification.textContent = 'Expected a File not a Text. Please provide a File.';
+            } else if (response == "expectedTextNotFile"){
+                notExpectedNotification.textContent = 'Expected a Text not a File. Please provide a Text.';
+            }
             notificationContainer.appendChild(notExpectedNotification);
             this.chatContainer?.appendChild(notificationContainer);
         }
@@ -217,23 +194,23 @@ export class ChatManager {
     }
     
     createTableFromCSV(csvText: string): HTMLDivElement {
-        const tableContainer = document.createElement('div'); // Container für Tabelle & Metadaten
-        tableContainer.classList.add('p-2', 'bg-light', 'border', 'rounded'); // Bootstrap-Styling
+        const tableContainer = document.createElement('div'); // Container for table & metadata
+        tableContainer.classList.add('p-2', 'bg-light', 'border', 'rounded');
     
         const table = document.createElement('table');
         table.classList.add('table', 'table-bordered', 'table-sm', 'chat-table');
     
-        const rows = csvText.trim().split('\n').map(row => row.split(',')); // CSV in 2D-Array umwandeln
+        const rows = csvText.trim().split('\n').map(row => row.split(',')); // Convert CSV to 2D array
         const totalRows = rows.length;
         const totalCols = rows[0].length;
     
-        // Anzeige der Anzahl der Zeilen & Spalten
+        // Display the number of rows & columns
         const infoText = document.createElement('p');
         infoText.textContent = `${totalRows} Rows, ${totalCols} Columns`;
         infoText.classList.add('mb-2', 'fw-bold');
         tableContainer.appendChild(infoText);
     
-        // Bestimmen, welche Zeilen angezeigt werden sollen
+        // Reduce the number of Rows if there are more than 20
         let visibleRows: string[][] = [];
         if (totalRows > 20) {
             visibleRows = [...rows.slice(0, 5), ["..."], ...rows.slice(-5)];
@@ -241,7 +218,7 @@ export class ChatManager {
             visibleRows = rows;
         }
     
-        // Reduziere die Anzahl der Spalten, wenn mehr als 20 vorhanden sind
+        // Reduce the number of columns if there are more than 10
         let visibleRowsWithCols: string[][] = visibleRows.map(row => {
             if (row.length > 10) {
                 return [...row.slice(0, 3), "...", ...row.slice(-3)];
@@ -250,14 +227,14 @@ export class ChatManager {
             }
         });
     
-        // Tabelle generieren
+        // Generate table
         visibleRowsWithCols.forEach((rowText, rowIndex) => {
             const row = document.createElement('tr');
     
             rowText.forEach(cellText => {
                 let cell;
                 if (rowIndex === 0) {
-                    cell = document.createElement('th'); // Erste Zeile = Header
+                    cell = document.createElement('th'); // First line = Header
                 } else {
                     cell = document.createElement('td');
                 }
@@ -284,75 +261,62 @@ export class ChatManager {
     }
 
     newExecution(): void {
-        // Erstelle den Haupt-Div-Container
         const dividerContainer = document.createElement('div');
         dividerContainer.classList.add('divider', 'd-flex', 'align-items-center', 'mb-4');
-
-        // Erstelle das <p>-Element für die Text "Execution number"
         const dividerText = document.createElement('p');
         dividerText.classList.add('text-center', 'mx-3', 'mb-0');
         dividerText.style.color = '#a2aab7';
         dividerText.textContent = this.executionCounter + ' Execution';
-
-        // Füge das <p>-Element in den Container ein
         dividerContainer.appendChild(dividerText);
-
-        // Füge den Divider dem Chat-Container hinzu
         this.chatContainer?.appendChild(dividerContainer);
         this.executionCounter += 1;
     }
 
-    // Eingabe verarbeiten
     processInput(): void {
         const input = this.inputField?.value;
 
         if (input && input.trim()) {            
 
-            // Callback aufrufen, wenn definiert
             if (this.onInput) {
                 const response = this.onInput(input);
                 this.chatInput(input, response)
             }
 
-            // Eingabefeld leeren
             this.clearInput();
         }
     }
 
-    // Upload verarbeiten
     processUpload(): void {
         if(this.fileInputButton?.files){
             const upload = this.fileInputButton.files[0];
             if (upload) {                
 
-                // Callback aufrufen, wenn definiert
                 if (this.onUpload) {
                     const response = this.onUpload(upload);
                     this.chatInput(upload, response);
                 }
             }
             
-            // Upload leeren
             this.clearUpload();
         }
         
     }
 
-    // Upload leeren
+
     clearUpload(): void {
         if (this.fileInputButton) {
             this.fileInputButton.value = '';
         }
     }
 
-    // Eingabefeld leeren
+
     clearInput(): void {
         if (this.inputField) {
             this.inputField.value = '';
         }
     }
 
-    // Listener für Benutzerinteraktionen
+
     initializeListeners(): void {
         if (this.inputField) {
             this.inputField.addEventListener('keydown', (event) => {

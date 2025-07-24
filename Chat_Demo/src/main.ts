@@ -301,14 +301,14 @@ function updateIcon() {
   }
 }
 
-// Beispiele auswählen
+// Select Example
 
 window.addEventListener("DOMContentLoaded", () => {
   const items = document.querySelectorAll(".dropdown-item");
 
   items.forEach((item, index) => {
     item.addEventListener("click", () => {
-      selectExample(index + 1); // 1-basiert
+      selectExample(index + 1); // 1-based
     });
   });
 });
@@ -337,14 +337,14 @@ function selectExample(num:number) {
   }
   fetch(path)
     .then(response => {
-      if (!response.ok) throw new Error("Datei konnte nicht geladen werden");
+      if (!response.ok) throw new Error("File could not be loaded");
       return response.text();
     })
     .then(data => {
-      loadCodeIntoEditor(data); // Deine bestehende Funktion
+      loadCodeIntoEditor(data);
     })
     .catch(error => {
-      console.error("Fehler beim Laden der Datei:", error);
+      console.error("Error loading the file:", error);
     });
 }
 
@@ -391,7 +391,7 @@ const editorElement = document.getElementById('codeMirrorEditor');
 if (editorElement) {
   editor = new EditorView({
     doc: "input('Hello, CodeMirror!')",
-    extensions: [basicSetup, python(), autocompletion({ override: [() => null] })], // verhindert alle Autocompletions
+    extensions: [basicSetup, python(), autocompletion({ override: [() => null] })], // prevents all autocompletions
     parent: editorElement,
   });
 } else {
