@@ -1,6 +1,7 @@
 # Images Pictures of the endangered animals and the csv
 # with the numbers can be found in the zip archive which
 # you can download via the download example data button
+# Image license information is provided in ‘license_information.txt’ (in the example data).
 
 from PIL import Image, ImageDraw, ImageFont
 import math

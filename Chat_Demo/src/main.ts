@@ -320,7 +320,7 @@ function selectExample(num:number) {
       path = "/caesar_cipher.py";
       break;
     case 2:
-      path = "/endangerd_speciec.py";
+      path = "/endangered_species.py";
       break
     case 3:
       path = "/InputText.py";

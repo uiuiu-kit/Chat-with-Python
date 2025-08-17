@@ -39,6 +39,7 @@ class MyRunner(PyodideRunner):
         img.save(buffered, format="PNG")
         img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
         self.output("img_output", f"{prefix} {img_str}")
+        self.output_buffer.flush()
     
     def override_matplotlib(self):
         """if matplotlib is imported, we have to patch the show function. the show function exports the plot as

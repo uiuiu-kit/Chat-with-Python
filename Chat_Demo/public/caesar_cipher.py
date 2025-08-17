@@ -21,11 +21,12 @@ while mode == None:
     if mode != 'encode' and mode != 'decode':
         mode = None
     else:
-        print(f"starting {mode}-loop, all input from now on will be {mode}d with a caeser cipher")
+        cur_output = f"starting {mode}-loop, all input from now on will be {mode}d with a caeser cipher"
 while True:
+    text_input = input(cur_output)
     if mode == 'encode':
-        text_input = input(caesar_encrypt(text_input))
+        cur_output = caesar_encrypt(text_input)
     else:
-        text_input = input(caesar_decrypt(text_input))
+        cur_output = caesar_decrypt(text_input)
             
 
